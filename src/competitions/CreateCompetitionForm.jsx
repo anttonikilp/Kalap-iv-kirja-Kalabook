@@ -3,6 +3,7 @@ import { LAJIT } from '../catches/species.js'
 import { MITTARIT, LASKENTATAVAT } from './constants.js'
 import { tanaan } from './dateUtils.js'
 import { luoKisa } from './competitionService.js'
+import { TrophyIcon, XIcon, PlusIcon } from '../components/icons.jsx'
 
 export default function CreateCompetitionForm({ onLuotu, onPeruuta }) {
   const [nimi, setNimi] = useState('')
@@ -37,7 +38,10 @@ export default function CreateCompetitionForm({ onLuotu, onPeruuta }) {
 
   return (
     <form className="kisa-lomake" onSubmit={tallenna}>
-      <h2>Uusi kisa</h2>
+      <h2>
+        <TrophyIcon size={18} />
+        Uusi kisa
+      </h2>
 
       <label>
         Nimi
@@ -83,7 +87,7 @@ export default function CreateCompetitionForm({ onLuotu, onPeruuta }) {
           ))}
         </select>
       </label>
-      <p className="tila-teksti kisa-ohje">
+      <p className="tila-teksti-pieni kisa-ohje">
         Automaattinen: kaikki kisan aikana kirjatut, kohteeseen sopivat saaliisi lasketaan mukaan
         itsestään. Ilmoitettavat: vain saaliit jotka erikseen liität kisaan lasketaan.
       </p>
@@ -102,10 +106,12 @@ export default function CreateCompetitionForm({ onLuotu, onPeruuta }) {
 
       <div className="kisa-lomake-napit">
         <button type="button" className="friend-nappi-toissijainen" onClick={onPeruuta}>
+          <XIcon size={15} />
           Peruuta
         </button>
         <button type="submit" className="btn-primary" disabled={tallennetaan}>
-          {tallennetaan ? 'Luodaan...' : 'Luo kisa'}
+          <PlusIcon size={16} />
+          {tallennetaan ? 'Luodaan…' : 'Luo kisa'}
         </button>
       </div>
     </form>

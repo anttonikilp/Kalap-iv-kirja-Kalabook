@@ -1,15 +1,40 @@
 :root {
-  --vari-tausta: #f4faf9;
-  --vari-pinta: #ffffff;
-  --vari-paa: #0f6e63;
-  --vari-paa-tumma: #0b4f47;
-  --vari-korostus: #ff8a3d;
-  --vari-teksti: #1c2b29;
-  --vari-teksti-hento: #5c6f6b;
-  --vari-virhe: #c62828;
-  --vari-onnistui: #2e7d32;
-  --vari-reunaviiva: #dfece9;
-  color-scheme: light;
+  /* Tausta ja pinnat */
+  --vari-tausta: #10161a;
+  --vari-pinta: #1a2226;
+  --vari-pinta-korotettu: #212b30;
+
+  /* Paavari (hillitty sinivihrea) - kayttajaliittyman rungon vari */
+  --vari-paa: #5b9490;
+  --vari-paa-vaalea: #94c7c2;
+  --vari-paa-tumma: #2c4b48;
+  --vari-paa-hento: rgba(91, 148, 144, 0.16);
+
+  /* Korostusvari - vain tarkeimpaan toimintoon (paatoiminnon nappi) */
+  --vari-korostus: #d97757;
+  --vari-korostus-tumma: #b8613f;
+  --vari-korostus-hento: rgba(217, 119, 87, 0.18);
+
+  /* Neutraalit tekstivarit */
+  --vari-teksti: #eef1f2;
+  --vari-teksti-hento: #a3aeb2;
+  --vari-teksti-himmea: #6f7a7e;
+
+  /* Rajaviivat ja tilaviestit */
+  --vari-reunaviiva: #2a3438;
+  --vari-virhe: #e5787a;
+  --vari-onnistui: #7fc3a0;
+
+  /* Yhtenaiset mitat */
+  --sade-s: 10px;
+  --sade-m: 14px;
+  --sade-l: 18px;
+  --vali-s: 0.5rem;
+  --vali-m: 1rem;
+  --vali-l: 1.5rem;
+  --varjo-kortti: 0 1px 2px rgba(0, 0, 0, 0.3);
+
+  color-scheme: dark;
 }
 
 * {
@@ -27,6 +52,43 @@ body {
   background: var(--vari-tausta);
   color: var(--vari-teksti);
   -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: inherit;
+  color: var(--vari-teksti);
+}
+
+h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--vari-teksti-hento);
+}
+
+p {
+  line-height: 1.5;
 }
 
 button,
@@ -37,6 +99,24 @@ textarea {
   color: inherit;
 }
 
+button {
+  cursor: pointer;
+}
+
+input,
+select,
+textarea {
+  color-scheme: dark;
+}
+
 #root {
   min-height: 100vh;
+}
+
+.ikoni {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+  vertical-align: -0.125em;
 }

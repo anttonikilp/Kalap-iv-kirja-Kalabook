@@ -28,14 +28,14 @@ export default function InviteFriendPanel({ kisaId, osallistujat, onKutsuttu }) 
     }
   }, [])
 
-  if (lataa) return <p className="tila-teksti">Ladataan kavereita...</p>
+  if (lataa) return <p className="tila-teksti-pieni">Ladataan kavereita...</p>
   if (virhe) return <p className="lomake-virhe">Virhe: {virhe}</p>
 
   const mukanaOlevat = new Set(osallistujat.map((o) => o.kayttaja_id))
   const kutsuttavissa = kaverit.filter((k) => !mukanaOlevat.has(k.profiili.id))
 
   if (kutsuttavissa.length === 0) {
-    return <p className="tila-teksti">Kaikki kaverisi ovat jo mukana tai kutsuttuina.</p>
+    return <p className="tila-teksti-pieni">Kaikki kaverisi ovat jo mukana tai kutsuttuina.</p>
   }
 
   return (

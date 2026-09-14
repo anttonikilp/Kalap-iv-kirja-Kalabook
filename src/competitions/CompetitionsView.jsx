@@ -4,6 +4,7 @@ import CompetitionInvites from './CompetitionInvites.jsx'
 import CompetitionList from './CompetitionList.jsx'
 import CompetitionDetail from './CompetitionDetail.jsx'
 import CreateCompetitionForm from './CreateCompetitionForm.jsx'
+import { PlusIcon } from '../components/icons.jsx'
 
 export default function CompetitionsView() {
   const [omaId, setOmaId] = useState(null)
@@ -75,6 +76,7 @@ export default function CompetitionsView() {
   return (
     <div className="friends-view">
       <button type="button" className="btn-primary" onClick={() => setNaytaLomake(true)}>
+        <PlusIcon size={17} />
         Luo uusi kisa
       </button>
 

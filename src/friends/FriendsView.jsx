@@ -3,6 +3,7 @@ import { haeOmaProfiili } from './profileService.js'
 import * as friendService from './friendService.js'
 import UsernameForm from './UsernameForm.jsx'
 import FriendRequestItem from './FriendRequestItem.jsx'
+import { UsersIcon, InboxIcon } from '../components/icons.jsx'
 
 export default function FriendsView() {
   const [profiili, setProfiili] = useState(null)
@@ -103,6 +104,7 @@ export default function FriendsView() {
   return (
     <div className="friends-view">
       <p className="friends-oma-nimi">
+        <UsersIcon size={15} />
         Oma käyttäjänimi: <strong>@{profiili.kayttajanimi}</strong>
       </p>
 
@@ -157,7 +159,7 @@ export default function FriendsView() {
           <section className="friends-osio">
             <h3>Lähetetyt pyynnöt</h3>
             {lahetetyt.length === 0 ? (
-              <p className="tila-teksti">Ei odottavia pyyntöjä.</p>
+              <p className="tila-teksti-pieni">Ei odottavia pyyntöjä.</p>
             ) : (
               <ul className="friend-list">
                 {lahetetyt.map((rivi) => (
@@ -178,7 +180,10 @@ export default function FriendsView() {
           <section className="friends-osio">
             <h3>Kaverit</h3>
             {kaverit.length === 0 ? (
-              <p className="tila-teksti">Ei vielä kavereita.</p>
+              <div className="tyhja-tila tyhja-tila-pieni">
+                <InboxIcon size={22} />
+                <p>Ei vielä kavereita.</p>
+              </div>
             ) : (
               <ul className="friend-list">
                 {kaverit.map((rivi) => (

@@ -2,13 +2,17 @@ import { useState } from 'react'
 import { vastaaKutsuun } from './competitionService.js'
 import { muotoilePaiva } from './dateUtils.js'
 import { mittarinNimi } from './constants.js'
+import { InboxIcon, CheckIcon, XIcon } from '../components/icons.jsx'
 
 export default function CompetitionInvites({ kutsut, onMuutos }) {
   if (kutsut.length === 0) return null
 
   return (
     <section className="friends-osio">
-      <h3>Saapuneet kisakutsut</h3>
+      <h3>
+        <InboxIcon size={14} />
+        Saapuneet kisakutsut
+      </h3>
       <ul className="friend-list">
         {kutsut.map((kutsu) => (
           <InviteItem key={kutsu.id} kutsu={kutsu} onMuutos={onMuutos} />
@@ -54,9 +58,11 @@ function InviteItem({ kutsu, onMuutos }) {
           onClick={() => vastaa(false)}
           disabled={kasitellaan}
         >
+          <XIcon size={15} />
           Hylkää
         </button>
         <button type="button" className="friend-nappi" onClick={() => vastaa(true)} disabled={kasitellaan}>
+          <CheckIcon size={15} />
           Hyväksy
         </button>
       </div>

@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { LAJIT, KALASTUSTAVAT } from './species.js'
 import { lisaaSaalis } from './catchService.js'
 import { useTrips } from '../trips/TripsContext.jsx'
+import { CameraIcon, MapPinIcon } from '../components/icons.jsx'
 
 function nytPaikallisena() {
   const nyt = new Date()
@@ -120,13 +121,16 @@ export default function CatchForm({ onTallennettu }) {
             className={`laji-nappi ${lomake.laji === laji.id ? 'valittu' : ''}`}
             onClick={() => paivita('laji', laji.id)}
           >
-            <span className="laji-emoji">{laji.emoji}</span>
-            {laji.nimi}
+            <span className="laji-merkki" aria-hidden="true">
+              {laji.nimi.charAt(0)}
+            </span>
+            <span className="laji-teksti">{laji.nimi}</span>
           </button>
         ))}
       </div>
 
       <label className="kuva-valinta">
+        <CameraIcon size={18} />
         Lisää kuva
         <input
           ref={tiedostoInput}
@@ -187,7 +191,8 @@ export default function CatchForm({ onTallennettu }) {
               onChange={(e) => paivita('sijainti_teksti', e.target.value)}
             />
             <button type="button" onClick={haeSijainti} disabled={haetaanSijaintia}>
-              {haetaanSijaintia ? 'Haetaan...' : 'GPS'}
+              <MapPinIcon size={16} />
+              {haetaanSijaintia ? 'Haetaan…' : 'GPS'}
             </button>
           </div>
         </label>

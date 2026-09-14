@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTrips } from './TripsContext.jsx'
+import { CompassIcon } from '../components/icons.jsx'
 
 export default function ReissuPalkki() {
   const { aktiivinenReissu, lataaAktiivinen, aloitaReissu, lopetaReissu } = useTrips()
@@ -40,6 +41,7 @@ export default function ReissuPalkki() {
   if (aktiivinenReissu) {
     return (
       <div className="reissu-palkki reissu-palkki-aktiivinen">
+        <CompassIcon size={20} className="reissu-palkki-ikoni" />
         <div className="reissu-palkki-tiedot">
           <strong>Reissu käynnissä</strong>
           <span>

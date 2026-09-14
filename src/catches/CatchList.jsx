@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { haeSaaliit } from './catchService.js'
 import { lajinNimi } from './species.js'
+import { ImageOffIcon, MapPinIcon, InboxIcon } from '../components/icons.jsx'
 
 export default function CatchList({ paivitysAvain }) {
   const [saaliit, setSaaliit] = useState([])
@@ -30,7 +31,12 @@ export default function CatchList({ paivitysAvain }) {
   if (lataa) return <p className="tila-teksti">Ladataan saaliita...</p>
   if (virhe) return <p className="lomake-virhe">Virhe: {virhe}</p>
   if (saaliit.length === 0) {
-    return <p className="tila-teksti">Ei vielä saaliita. Lisää ensimmäinen saaliisi!</p>
+    return (
+      <div className="tyhja-tila">
+        <InboxIcon size={28} />
+        <p>Ei vielä saaliita. Lisää ensimmäinen saaliisi!</p>
+      </div>
+    )
   }
 
   return (
@@ -40,17 +46,24 @@ export default function CatchList({ paivitysAvain }) {
           {saalis.kuva_url ? (
             <img src={saalis.kuva_url} alt={saalis.laji} className="catch-thumb" />
           ) : (
-            <div className="catch-thumb catch-thumb-placeholder">-</div>
+            <div className="catch-thumb catch-thumb-placeholder">
+              <ImageOffIcon size={20} />
+            </div>
           )}
           <div className="catch-item-tiedot">
             <strong>{lajinNimi(saalis.laji)}</strong>
             <span>{muotoilePaivamaara(saalis.ajankohta)}</span>
             <span className="catch-item-mitat">
               {saalis.paino_kg ? `${saalis.paino_kg} kg` : ''}
-              {saalis.paino_kg && saalis.pituus_cm ? ' - ' : ''}
+              {saalis.paino_kg && saalis.pituus_cm ? ' · ' : ''}
               {saalis.pituus_cm ? `${saalis.pituus_cm} cm` : ''}
             </span>
-            {saalis.sijainti_teksti && <span>{saalis.sijainti_teksti}</span>}
+            {saalis.sijainti_teksti && (
+              <span className="catch-item-sijainti">
+                <MapPinIcon size={13} />
+                {saalis.sijainti_teksti}
+              </span>
+            )}
           </div>
         </li>
       ))}

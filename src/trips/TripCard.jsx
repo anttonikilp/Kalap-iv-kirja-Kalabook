@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { lajinNimi } from '../catches/species.js'
+import { ClockIcon, FishIcon, MedalIcon } from '../components/icons.jsx'
 
 export default function TripCard({ reissu, saaliit, onLopeta }) {
   const [kasitellaan, setKasitellaan] = useState(false)
@@ -45,8 +46,14 @@ export default function TripCard({ reissu, saaliit, onLopeta }) {
       </div>
 
       <div className="trip-card-rivi">
-        <span>Kesto: {muotoileKesto(reissu.aloitusaika, reissu.lopetusaika)}</span>
-        <span>Saaliita: {saaliit.length}</span>
+        <span>
+          <ClockIcon size={14} />
+          {muotoileKesto(reissu.aloitusaika, reissu.lopetusaika)}
+        </span>
+        <span>
+          <FishIcon size={14} />
+          {saaliit.length} saalista
+        </span>
       </div>
 
       {Object.keys(maaraLajeittain).length > 0 && (
@@ -62,6 +69,7 @@ export default function TripCard({ reissu, saaliit, onLopeta }) {
       {suurin && (
         <div className="trip-card-rivi">
           <span>
+            <MedalIcon size={14} />
             Suurin: {lajinNimi(suurin.laji)} {suurin.paino_kg} kg
           </span>
         </div>
