@@ -1,0 +1,377 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-bottom: 76px;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, var(--vari-paa), var(--vari-paa-tumma));
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.kirjaudu-ulos {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
+.app-sisalto {
+  flex: 1;
+  padding: 1rem;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.app-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background: var(--vari-pinta);
+  border-top: 1px solid var(--vari-reunaviiva);
+  padding: 0.4rem 0.5rem calc(0.4rem + env(safe-area-inset-bottom));
+}
+
+.app-nav button {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 0.6rem 0.25rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  color: var(--vari-teksti-hento);
+}
+
+.app-nav button.aktiivinen {
+  background: rgba(15, 110, 99, 0.1);
+  color: var(--vari-paa);
+  font-weight: 600;
+}
+
+.catch-form {
+  background: var(--vari-pinta);
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.catch-form h2 {
+  margin-top: 0;
+}
+
+.laji-valinta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.laji-nappi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem 0.25rem;
+  border: 2px solid var(--vari-reunaviiva);
+  border-radius: 14px;
+  background: var(--vari-tausta);
+  font-size: 0.85rem;
+}
+
+.laji-nappi.valittu {
+  border-color: var(--vari-paa);
+  background: rgba(15, 110, 99, 0.1);
+  color: var(--vari-paa-tumma);
+  font-weight: 600;
+}
+
+.laji-emoji {
+  font-size: 1.5rem;
+}
+
+.kuva-valinta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  border: 2px dashed var(--vari-reunaviiva);
+  border-radius: 12px;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  color: var(--vari-teksti-hento);
+}
+
+.kuva-esikatselu {
+  display: block;
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 12px;
+  margin-bottom: 0.75rem;
+  object-fit: cover;
+}
+
+.lisatiedot {
+  border-top: 1px solid var(--vari-reunaviiva);
+  padding-top: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.lisatiedot summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--vari-paa);
+  padding: 0.25rem 0;
+}
+
+.lisatiedot label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--vari-teksti-hento);
+}
+
+.lisatiedot input,
+.lisatiedot select,
+.lisatiedot textarea {
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--vari-reunaviiva);
+  border-radius: 10px;
+  font-size: 1rem;
+  color: var(--vari-teksti);
+  background: white;
+}
+
+.sijainti-rivi {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.sijainti-rivi input {
+  flex: 1;
+}
+
+.sijainti-rivi button {
+  padding: 0 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--vari-reunaviiva);
+  background: var(--vari-tausta);
+  white-space: nowrap;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 14px;
+  background: var(--vari-korostus);
+  color: white;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+}
+
+.btn-tallenna {
+  margin-top: 0.5rem;
+}
+
+.lomake-virhe {
+  color: var(--vari-virhe);
+  font-size: 0.9rem;
+}
+
+.lomake-onnistui {
+  color: var(--vari-onnistui);
+  font-size: 0.9rem;
+}
+
+.tila-teksti {
+  text-align: center;
+  color: var(--vari-teksti-hento);
+  padding: 2rem 1rem;
+}
+
+.tila-koko-ruutu {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.catch-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.catch-item {
+  display: flex;
+  gap: 0.75rem;
+  background: var(--vari-pinta);
+  border-radius: 14px;
+  padding: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  align-items: center;
+}
+
+.catch-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--vari-tausta);
+}
+
+.catch-thumb-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.catch-item-tiedot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.9rem;
+  color: var(--vari-teksti-hento);
+}
+
+.catch-item-tiedot strong {
+  color: var(--vari-teksti);
+  font-size: 1rem;
+}
+
+.stats-kortti {
+  background: linear-gradient(135deg, var(--vari-paa), var(--vari-paa-tumma));
+  color: white;
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.stats-luku {
+  font-size: 2.5rem;
+  font-weight: 800;
+}
+
+.stats-lista {
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  background: var(--vari-pinta);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.stats-lista li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--vari-reunaviiva);
+}
+
+.stats-lista li:last-child {
+  border-bottom: none;
+}
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: linear-gradient(160deg, var(--vari-paa) 0%, var(--vari-tausta) 60%);
+}
+
+.auth-card {
+  background: var(--vari-pinta);
+  border-radius: 20px;
+  padding: 2rem 1.5rem;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+
+.auth-card h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+}
+
+.auth-subtitle {
+  color: var(--vari-teksti-hento);
+  margin-bottom: 1.5rem;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: left;
+}
+
+.auth-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--vari-teksti-hento);
+}
+
+.auth-form input {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--vari-reunaviiva);
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.auth-error {
+  color: var(--vari-virhe);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.auth-info {
+  color: var(--vari-onnistui);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.auth-toggle {
+  margin-top: 1.25rem;
+  background: none;
+  border: none;
+  color: var(--vari-paa);
+  font-size: 0.9rem;
+  text-decoration: underline;
+}
