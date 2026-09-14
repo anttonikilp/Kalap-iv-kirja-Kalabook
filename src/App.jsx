@@ -7,6 +7,7 @@ import TripsList from './trips/TripsList.jsx'
 import CatchForm from './catches/CatchForm.jsx'
 import CatchList from './catches/CatchList.jsx'
 import Stats from './stats/Stats.jsx'
+import FriendsView from './friends/FriendsView.jsx'
 import './App.css'
 
 function PaaNakyma({ signOut }) {
@@ -37,6 +38,7 @@ function PaaNakyma({ signOut }) {
         {valilehti === 'historia' && <CatchList paivitysAvain={paivitysAvain} />}
         {valilehti === 'reissut' && <TripsList paivitysAvain={paivitysAvain} />}
         {valilehti === 'tilastot' && <Stats paivitysAvain={paivitysAvain} />}
+        {valilehti === 'kaverit' && <FriendsView />}
       </main>
 
       <nav className="app-nav">
@@ -63,6 +65,12 @@ function PaaNakyma({ signOut }) {
           onClick={() => setValilehti('tilastot')}
         >
           Tilastot
+        </button>
+        <button
+          className={valilehti === 'kaverit' ? 'aktiivinen' : ''}
+          onClick={() => setValilehti('kaverit')}
+        >
+          Kaverit
         </button>
       </nav>
     </div>
