@@ -22,7 +22,7 @@ export default function AuthPage() {
     if (error) {
       setVirhe(virheTeksti(error))
     } else if (tila === 'rekisterodi') {
-      setInfo('Tarkista sahkopostisi ja vahvista tilisi, jotta voit kirjautua sisaan.')
+      setInfo('Tarkista sähköpostisi ja vahvista tilisi, jotta voit kirjautua sisään.')
     }
 
     setLahetetaan(false)
@@ -31,14 +31,14 @@ export default function AuthPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>Kalapaivakirja</h1>
+        <h1>Kalapäiväkirja</h1>
         <p className="auth-subtitle">
-          {tila === 'kirjaudu' ? 'Kirjaudu sisaan' : 'Luo uusi tili'}
+          {tila === 'kirjaudu' ? 'Kirjaudu sisään' : 'Luo uusi tili'}
         </p>
 
         <form onSubmit={lahetaLomake} className="auth-form">
           <label>
-            Sahkoposti
+            Sähköposti
             <input
               type="email"
               required
@@ -64,7 +64,7 @@ export default function AuthPage() {
           {info && <p className="auth-info">{info}</p>}
 
           <button type="submit" className="btn-primary" disabled={lahetetaan}>
-            {lahetetaan ? 'Hetki...' : tila === 'kirjaudu' ? 'Kirjaudu sisaan' : 'Rekisteroidy'}
+            {lahetetaan ? 'Hetki…' : tila === 'kirjaudu' ? 'Kirjaudu sisään' : 'Rekisteröidy'}
           </button>
         </form>
 
@@ -78,8 +78,8 @@ export default function AuthPage() {
           }}
         >
           {tila === 'kirjaudu'
-            ? 'Ei viela tilia? Rekisteroidy'
-            : 'Onko sinulla jo tili? Kirjaudu sisaan'}
+            ? 'Ei vielä tiliä? Rekisteröidy'
+            : 'Onko sinulla jo tili? Kirjaudu sisään'}
         </button>
       </div>
     </div>
@@ -90,13 +90,13 @@ function virheTeksti(error) {
   const viesti = error.message || ''
 
   if (viesti.includes('Invalid login credentials')) {
-    return 'Vaara sahkoposti tai salasana.'
+    return 'Väärä sähköposti tai salasana.'
   }
   if (viesti.includes('User already registered')) {
-    return 'Tunnus on jo olemassa. Kirjaudu sisaan.'
+    return 'Tunnus on jo olemassa. Kirjaudu sisään.'
   }
   if (viesti.includes('Password should be at least')) {
-    return 'Salasanan tulee olla vahintaan 6 merkkia.'
+    return 'Salasanan tulee olla vähintään 6 merkkiä.'
   }
   return 'Jotain meni pieleen: ' + viesti
 }
