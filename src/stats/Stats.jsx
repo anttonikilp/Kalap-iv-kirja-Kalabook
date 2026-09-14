@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { haeSaaliit } from '../catches/catchService.js'
 import { lajinNimi } from '../catches/species.js'
+import { ChartIcon, FishIcon, MedalIcon } from '../components/icons.jsx'
 
 export default function Stats({ paivitysAvain }) {
   const [saaliit, setSaaliit] = useState([])
@@ -30,7 +31,12 @@ export default function Stats({ paivitysAvain }) {
   if (lataa) return <p className="tila-teksti">Lasketaan tilastoja...</p>
   if (virhe) return <p className="lomake-virhe">Virhe: {virhe}</p>
   if (saaliit.length === 0) {
-    return <p className="tila-teksti">Ei vielä tilastoja - lisää ensin saaliita.</p>
+    return (
+      <div className="tyhja-tila">
+        <ChartIcon size={28} />
+        <p>Ei vielä tilastoja - lisää ensin saaliita.</p>
+      </div>
+    )
   }
 
   const maaraLajeittain = {}
@@ -53,6 +59,7 @@ export default function Stats({ paivitysAvain }) {
       <h2>Tilastot</h2>
 
       <div className="stats-kortti">
+        <FishIcon size={22} />
         <span className="stats-luku">{saaliit.length}</span>
         <span>saalista yhteensä</span>
       </div>
@@ -71,7 +78,10 @@ export default function Stats({ paivitysAvain }) {
 
       <h3>Suurin saalis lajeittain (paino)</h3>
       {Object.keys(suurinLajeittain).length === 0 ? (
-        <p className="tila-teksti">Lisää paino saaliille nähdäksesi ennätykset.</p>
+        <p className="tila-teksti-pieni">
+          <MedalIcon size={14} />
+          Lisää paino saaliille nähdäksesi ennätykset.
+        </p>
       ) : (
         <ul className="stats-lista">
           {Object.entries(suurinLajeittain).map(([laji, saalis]) => (

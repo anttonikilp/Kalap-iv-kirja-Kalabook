@@ -1,9 +1,9 @@
 export const LAJIT = [
-  { id: 'kuha', nimi: 'Kuha', emoji: '🐟' },
-  { id: 'ahven', nimi: 'Ahven', emoji: '🐠' },
-  { id: 'hauki', nimi: 'Hauki', emoji: '🐍' },
-  { id: 'taimen', nimi: 'Taimen', emoji: '🐡' },
-  { id: 'muu', nimi: 'Muu', emoji: '🎣' },
+  { id: 'kuha', nimi: 'Kuha' },
+  { id: 'ahven', nimi: 'Ahven' },
+  { id: 'hauki', nimi: 'Hauki' },
+  { id: 'taimen', nimi: 'Taimen' },
+  { id: 'muu', nimi: 'Muu' },
 ]
 
 export const KALASTUSTAVAT = [

@@ -9,7 +9,25 @@ import CatchList from './catches/CatchList.jsx'
 import Stats from './stats/Stats.jsx'
 import FriendsView from './friends/FriendsView.jsx'
 import CompetitionsView from './competitions/CompetitionsView.jsx'
+import {
+  PlusIcon,
+  ListIcon,
+  CompassIcon,
+  ChartIcon,
+  UsersIcon,
+  TrophyIcon,
+  LogOutIcon,
+} from './components/icons.jsx'
 import './App.css'
+
+const VALILEHDET = [
+  { id: 'lisaa', nimi: 'Lisää', Ikoni: PlusIcon },
+  { id: 'historia', nimi: 'Historia', Ikoni: ListIcon },
+  { id: 'reissut', nimi: 'Reissut', Ikoni: CompassIcon },
+  { id: 'tilastot', nimi: 'Tilastot', Ikoni: ChartIcon },
+  { id: 'kaverit', nimi: 'Kaverit', Ikoni: UsersIcon },
+  { id: 'kisat', nimi: 'Kisat', Ikoni: TrophyIcon },
+]
 
 function PaaNakyma({ signOut }) {
   const [valilehti, setValilehti] = useState('lisaa')
@@ -25,6 +43,7 @@ function PaaNakyma({ signOut }) {
       <header className="app-header">
         <h1>Kalapäiväkirja</h1>
         <button className="kirjaudu-ulos" onClick={signOut}>
+          <LogOutIcon size={16} />
           Kirjaudu ulos
         </button>
       </header>
@@ -44,42 +63,16 @@ function PaaNakyma({ signOut }) {
       </main>
 
       <nav className="app-nav">
-        <button
-          className={valilehti === 'lisaa' ? 'aktiivinen' : ''}
-          onClick={() => setValilehti('lisaa')}
-        >
-          Lisää
-        </button>
-        <button
-          className={valilehti === 'historia' ? 'aktiivinen' : ''}
-          onClick={() => setValilehti('historia')}
-        >
-          Historia
-        </button>
-        <button
-          className={valilehti === 'reissut' ? 'aktiivinen' : ''}
-          onClick={() => setValilehti('reissut')}
-        >
-          Reissut
-        </button>
-        <button
-          className={valilehti === 'tilastot' ? 'aktiivinen' : ''}
-          onClick={() => setValilehti('tilastot')}
-        >
-          Tilastot
-        </button>
-        <button
-          className={valilehti === 'kaverit' ? 'aktiivinen' : ''}
-          onClick={() => setValilehti('kaverit')}
-        >
-          Kaverit
-        </button>
-        <button
-          className={valilehti === 'kisat' ? 'aktiivinen' : ''}
-          onClick={() => setValilehti('kisat')}
-        >
-          Kisat
-        </button>
+        {VALILEHDET.map(({ id, nimi, Ikoni }) => (
+          <button
+            key={id}
+            className={valilehti === id ? 'aktiivinen' : ''}
+            onClick={() => setValilehti(id)}
+          >
+            <Ikoni size={19} />
+            <span>{nimi}</span>
+          </button>
+        ))}
       </nav>
     </div>
   )

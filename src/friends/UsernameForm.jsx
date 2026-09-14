@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { asetaKayttajanimi } from './profileService.js'
+import { UsersIcon } from '../components/icons.jsx'
 
 const KAYTTAJANIMI_SAANTO = /^[a-z0-9_]{3,20}$/
 
@@ -36,6 +37,9 @@ export default function UsernameForm({ onValmis }) {
 
   return (
     <div className="username-kortti">
+      <div className="username-ikoni">
+        <UsersIcon size={22} />
+      </div>
       <h2>Valitse käyttäjänimi</h2>
       <p className="tila-teksti">
         Tarvitset käyttäjänimen, jotta kaverit löytävät sinut. Käyttäjänimi näkyy

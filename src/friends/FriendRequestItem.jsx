@@ -1,4 +1,13 @@
 import { useState } from 'react'
+import { CheckIcon, XIcon, TrashIcon, UserPlusIcon } from '../components/icons.jsx'
+
+const TOIMINTOIKONIT = {
+  Hyväksy: CheckIcon,
+  Hylkää: XIcon,
+  Peru: XIcon,
+  Poista: TrashIcon,
+  Kutsu: UserPlusIcon,
+}
 
 export default function FriendRequestItem({
   profiili,
@@ -23,10 +32,18 @@ export default function FriendRequestItem({
     }
   }
 
+  const nimi = profiili?.nayttonimi || profiili?.kayttajanimi || 'Tuntematon käyttäjä'
+  const EnsisijainenIkoni = TOIMINTOIKONIT[ensisijainenTeksti]
+  const ToissijainenIkoni = TOIMINTOIKONIT[toissijainenTeksti]
+
   return (
     <li className="friend-item">
+      <div className="friend-item-avatar" aria-hidden="true">
+        {nimi.charAt(0).toUpperCase()}
+      </div>
+
       <div className="friend-item-tiedot">
-        <strong>{profiili?.nayttonimi || profiili?.kayttajanimi || 'Tuntematon käyttäjä'}</strong>
+        <strong>{nimi}</strong>
         {profiili?.nayttonimi && <span>@{profiili.kayttajanimi}</span>}
       </div>
 
@@ -38,6 +55,7 @@ export default function FriendRequestItem({
             onClick={() => suorita(toissijainenToiminto)}
             disabled={kasitellaan}
           >
+            {ToissijainenIkoni && <ToissijainenIkoni size={15} />}
             {toissijainenTeksti}
           </button>
         )}
@@ -48,6 +66,7 @@ export default function FriendRequestItem({
             onClick={() => suorita(ensisijainenToiminto)}
             disabled={kasitellaan}
           >
+            {EnsisijainenIkoni && <EnsisijainenIkoni size={15} />}
             {ensisijainenTeksti}
           </button>
         )}

@@ -3,6 +3,7 @@ import { haeReissut } from './tripService.js'
 import { haeSaaliit } from '../catches/catchService.js'
 import { useTrips } from './TripsContext.jsx'
 import TripCard from './TripCard.jsx'
+import { CompassIcon } from '../components/icons.jsx'
 
 export default function TripsList({ paivitysAvain }) {
   const { reissuPaivitysAvain, aktiivinenReissu, lopetaReissu } = useTrips()
@@ -37,7 +38,12 @@ export default function TripsList({ paivitysAvain }) {
   if (lataa) return <p className="tila-teksti">Ladataan reissuja...</p>
   if (virhe) return <p className="lomake-virhe">Virhe: {virhe}</p>
   if (reissut.length === 0) {
-    return <p className="tila-teksti">Ei vielä reissuja. Aloita reissu Lisää-välilehdellä!</p>
+    return (
+      <div className="tyhja-tila">
+        <CompassIcon size={28} />
+        <p>Ei vielä reissuja. Aloita reissu Lisää-välilehdellä!</p>
+      </div>
+    )
   }
 
   return (

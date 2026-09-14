@@ -1,9 +1,15 @@
 import { kisanTila, muotoilePaiva } from './dateUtils.js'
 import { mittarinNimi } from './constants.js'
+import { TrophyIcon, CalendarIcon } from '../components/icons.jsx'
 
 export default function CompetitionList({ kisat, onValitse }) {
   if (kisat.length === 0) {
-    return <p className="tila-teksti">Ei vielä kisoja. Luo ensimmäinen kisa!</p>
+    return (
+      <div className="tyhja-tila">
+        <TrophyIcon size={28} />
+        <p>Ei vielä kisoja. Luo ensimmäinen kisa!</p>
+      </div>
+    )
   }
 
   const ryhmat = { kaynnissa: [], tuleva: [], paattynyt: [] }
@@ -29,9 +35,13 @@ function Ryhma({ otsikko, kisat, onValitse }) {
       <ul className="friend-list">
         {kisat.map((kisa) => (
           <li key={kisa.id} className="friend-item kisa-listarivi" onClick={() => onValitse(kisa)}>
+            <div className="kisa-listarivi-ikoni">
+              <TrophyIcon size={17} />
+            </div>
             <div className="friend-item-tiedot">
               <strong>{kisa.nimi}</strong>
               <span>
+                <CalendarIcon size={13} />
                 {muotoilePaiva(kisa.alkupaiva)} – {muotoilePaiva(kisa.loppupaiva)} ·{' '}
                 {mittarinNimi(kisa.mittari)}
               </span>
