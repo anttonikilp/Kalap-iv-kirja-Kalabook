@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { LAJIT, KALASTUSTAVAT } from './species.js'
 import { lisaaSaalis } from './catchService.js'
+import { useTrips } from '../trips/TripsContext.jsx'
 
 function nytPaikallisena() {
   const nyt = new Date()
@@ -22,6 +23,7 @@ function tyhjaLomake() {
 }
 
 export default function CatchForm({ onTallennettu }) {
+  const { aktiivinenReissu } = useTrips()
   const [lomake, setLomake] = useState(tyhjaLomake)
   const [kuva, setKuva] = useState(null)
   const [kuvaEsikatselu, setKuvaEsikatselu] = useState(null)
@@ -88,6 +90,7 @@ export default function CatchForm({ onTallennettu }) {
         viehe: lomake.viehe || null,
         kalastustapa: lomake.kalastustapa || null,
         muistiinpanot: lomake.muistiinpanot || null,
+        reissu_id: aktiivinenReissu?.id ?? null,
       }
 
       const uusiSaalis = await lisaaSaalis(payload, kuva)
