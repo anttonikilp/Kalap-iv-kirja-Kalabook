@@ -1,14 +1,13 @@
 # Kalapaivakirja
 
 Mobiili edella toimiva kalastuspaivakirja. Kirjaudu sisaan, kirjaa saalis
-muutamalla napautuksella ja seuraa omia tilastojasi. Tausta on Supabase
-(tietokanta, kirjautuminen, kuvien tallennus).
+muutamalla napautuksella ja seuraa omia tilastojasi. Voit myos niputtaa
+saaliit yhteen kalareissuksi. Tausta on Supabase (tietokanta, kirjautuminen,
+kuvien tallennus).
 
-Tama on ensimmainen versio (ydin): kirjautuminen, saaliin lisays, oma
-historia ja perustilastot. Koodi on jaoteltu omiin kansioihin
-(`src/auth`, `src/catches`, `src/stats`), jotta esim. kaverit, kisat tai
-ilmoitukset on helppo lisata myohemmin ilman etta olemassa olevaa koodia
-tarvitsee purkaa.
+Koodi on jaoteltu omiin kansioihin (`src/auth`, `src/catches`, `src/trips`,
+`src/stats`), jotta esim. kaverit, kisat tai ilmoitukset on helppo lisata
+myohemmin ilman etta olemassa olevaa koodia tarvitsee purkaa.
 
 ## 1. Luo Supabase-projekti
 
@@ -18,23 +17,28 @@ tarvitsee purkaa.
 
 ## 2. Aja tietokantaskeema (pakollinen)
 
+### Uusi Supabase-projekti (ei viela mitaan taulua)
+
 1. Avaa tiedosto [`supabase/schema.sql`](supabase/schema.sql) tasta
    repositoriosta.
 2. Kopioi **koko** tiedoston sisalto.
 3. Liita se Supabasen SQL Editoriin ja paina **Run**.
 
-Tama luo:
+Tama luo kaiken kerralla: `saaliit`- ja `reissut`-taulut, RLS-kaytannot
+seka `saalis-kuvat`-storage-bucketin.
 
-- `saaliit`-taulun, johon kalasaaliit tallennetaan.
-- Row Level Security (RLS) -kaytannot, jotka varmistavat etta jokainen
-  kayttaja nakee ja voi muokata **vain omia** saaliitaan.
-- `saalis-kuvat`-nimisen Storage-bucketin saaliskuvia varten, seka
-  kaytannot jotka sallivat kayttajan ladata/muokata/poistaa vain omia
-  kuviaan (kuvien katselu on julkista, jotta kuvat voidaan nayttaa
-  suoraan sovelluksessa).
+### Sinulla on jo aiempi asennus (taulu "saaliit" on jo olemassa)
 
-Voit ajaa skriptin turvallisesti uudelleen (esim. jos teet muutoksia) -
-se ei riko olemassa olevaa dataa.
+Riittaa etta ajat vain uusimman migraation:
+
+1. Avaa tiedosto
+   [`supabase/migrations/0002_reissut.sql`](supabase/migrations/0002_reissut.sql).
+2. Kopioi koko sisalto Supabasen SQL Editoriin ja paina **Run**.
+
+Tama lisaa `reissut`-taulun, `saaliit.reissu_id`-sarakkeen seka niihin
+liittyvat RLS-kaytannot koskematta olemassa olevaan dataan.
+
+Molemmat skriptit on turvallista ajaa uudelleen tarvittaessa.
 
 ## 3. Hae Supabasen osoite ja avain
 
@@ -55,7 +59,7 @@ se ei riko olemassa olevaa dataa.
 
    ```
    VITE_SUPABASE_URL=https://xxxxxxxx.supabase.co
-   VITE_SUPABASE_ANON_KEY=liitä-tahan-oma-avaimesi
+   VITE_SUPABASE_ANON_KEY=liita-tahan-oma-avaimesi
    ```
 
 3. `.env`-tiedostoa **ei** koskaan commitoida gitiin (se on jo
@@ -95,16 +99,25 @@ Muita komentoja:
 2. Supabase lahettaa oletuksena vahvistussahkopostin - vahvista tili
    linkista ja kirjaudu sisaan.
    - Jos haluat testata nopeammin ilman sahkopostivahvistusta, voit
-     kaydä Supabasessa kohdassa **Authentication -> Providers -> Email**
+     kayda Supabasessa kohdassa **Authentication -> Providers -> Email**
      ja kytkea "Confirm email" pois paalta (kannattaa ottaa takaisin
      paalle ennen oikeaa julkaisua).
 3. Kirjautumisen jalkeen voit heti lisata saaliin: valitse laji ja paina
    "Tallenna saalis". Muut kentat (paino, pituus, sijainti, viehe,
    kalastustapa, kuva, muistiinpanot) loytyvat kohdasta "Lisaa tarkempia
    tietoja" eivatka ole pakollisia.
-4. "Historia"-valilehdella nakyvat omat saaliit uusin ensin, pikkukuvan
+4. "Lisaa"-valilehden ylaosassa voit aloittaa reissun (paikka on
+   valinnainen, aloitusaika kirjataan automaattisesti). Kun reissu on
+   kaynnissa, siita nakyy selkea palkki ja kaikki sen aikana lisatyt
+   saaliit liittyvat reissuun automaattisesti. Reissun voi lopettaa
+   milloin tahansa - saaliin voi aina lisata myos ilman reissua.
+5. "Historia"-valilehdella nakyvat omat saaliit uusin ensin, pikkukuvan
    kanssa.
-5. "Tilastot"-valilehdella nakyvat saaliiden kokonaismaara, maara
+6. "Reissut"-valilehdella nakyvat omat reissut uusin ensin: paivamaara,
+   paikka, kesto, saaliiden maara, lajijakauma, suurin kala ja kaytetyt
+   vieheet. Kaynnissa oleva reissu on merkitty ja sen voi lopettaa myos
+   taalta.
+7. "Tilastot"-valilehdella nakyvat saaliiden kokonaismaara, maara
    lajeittain ja suurin saalis (painon mukaan) kutakin lajia kohden.
 
 ## Projektin rakenne
@@ -112,7 +125,7 @@ Muita komentoja:
 ```
 src/
   main.jsx                  Sovelluksen kaynnistys
-  App.jsx                   Valilehdet (Lisaa / Historia / Tilastot) + kirjautumisen tarkistus
+  App.jsx                   Valilehdet (Lisaa / Historia / Reissut / Tilastot) + kirjautumisen tarkistus
   App.css / index.css       Tyylit (mobiili edella)
   lib/
     supabaseClient.js        Supabase-yhteyden alustus ymparistomuuttujista
@@ -122,28 +135,37 @@ src/
   catches/
     species.js               Lajit ja kalastustavat vakioina
     catchService.js          Supabase-kyselyt: hae, lisaa, poista saalis + kuvan lataus
-    CatchForm.jsx             Nopea lomake uuden saaliin lisaamiseen
+    CatchForm.jsx             Nopea lomake uuden saaliin lisaamiseen (liittyy kaynnissa olevaan reissuun)
     CatchList.jsx             Oma saalishistoria pikkukuvineen
+  trips/
+    tripService.js            Supabase-kyselyt: hae reissut/aktiivinen reissu, aloita, lopeta
+    TripsContext.jsx          Kaynnissa olevan reissun tilanhallinta (React Context)
+    ReissuPalkki.jsx          Aloita/lopeta-reissu-palkki Lisaa-nakymassa
+    TripCard.jsx              Yhden reissun koostekortti
+    TripsList.jsx             Reissut-valilehden lista
   stats/
     Stats.jsx                 Perustilastot (maara, lajijakauma, ennatykset)
 supabase/
-  schema.sql                 Tietokantataulu, RLS-kaytannot ja storage-bucket
+  schema.sql                 Koko tietokantarakenne (taulut, RLS-kaytannot, storage-bucket)
+  migrations/
+    0002_reissut.sql          Pelkka reissu-ominaisuuden lisays olemassa olevaan asennukseen
 ```
 
-Rakenne on tarkoituksella modulaarinen: `auth`, `catches` ja `stats` eivat
-riipu toisistaan enempaa kuin valttamatonta, joten esim. kaverit-, kisa-,
-ilmoitus- tai tekoalyominaisuudet on helppo lisata omina moduuleinaan
-myohemmin koskematta olemassa olevaan koodiin.
+Rakenne on tarkoituksella modulaarinen: `auth`, `catches`, `trips` ja
+`stats` eivat riipu toisistaan enempaa kuin valttamatonta, joten esim.
+kaverit-, kisa-, ilmoitus- tai tekoalyominaisuudet on helppo lisata omina
+moduuleinaan myohemmin koskematta olemassa olevaan koodiin.
 
 ## Huomioita
 
-- GPS-nappi ("Kirjaa sijaintini") pyytaa selaimelta lupaa paikannukseen -
-  selain kysyy tahan luvan erikseen. Jos paikannus ei ole kaytossa,
-  sijainnin voi kirjoittaa kasin.
+- GPS-nappi ("GPS") pyytaa selaimelta lupaa paikannukseen - selain kysyy
+  tahan luvan erikseen. Jos paikannus ei ole kaytossa, sijainnin voi
+  kirjoittaa kasin.
 - Kuvat tallennetaan julkiseen Storage-bucketiin nimella
   `{kayttajan_id}/....`, mutta vain omistaja voi lisata/muokata/poistaa
   omia kuviaan - tama on toteutettu Storagen RLS-kaytannoilla.
-- Tama versio kattaa tietoisesti vain ytimen: kirjautuminen, saaliin
-  lisays, historia ja perustilastot. Kaverit, kisat, ilmoitukset ja
-  tekoaly on jatetty tarkoituksella pois - ne on helppo lisata
-  myohemmin omina moduuleinaan.
+- Kayttajalla voi olla vain yksi kaynnissa oleva reissu kerrallaan
+  (tietokantatasolla varmistettu), mutta reissuja voi olla loputon maara
+  ja saaliin voi aina lisata myos ilman reissua.
+- Kaverit, kisat, ilmoitukset ja tekoaly on jatetty tarkoituksella pois -
+  ne on helppo lisata myohemmin omina moduuleinaan.

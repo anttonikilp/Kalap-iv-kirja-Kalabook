@@ -1,23 +1,17 @@
 import { useState } from 'react'
 import { AuthProvider, useAuth } from './auth/AuthContext.jsx'
 import AuthPage from './auth/AuthPage.jsx'
+import { TripsProvider } from './trips/TripsContext.jsx'
+import ReissuPalkki from './trips/ReissuPalkki.jsx'
+import TripsList from './trips/TripsList.jsx'
 import CatchForm from './catches/CatchForm.jsx'
 import CatchList from './catches/CatchList.jsx'
 import Stats from './stats/Stats.jsx'
 import './App.css'
 
-function Sovellus() {
-  const { user, loading, signOut } = useAuth()
+function PaaNakyma({ signOut }) {
   const [valilehti, setValilehti] = useState('lisaa')
   const [paivitysAvain, setPaivitysAvain] = useState(0)
-
-  if (loading) {
-    return <p className="tila-teksti tila-koko-ruutu">Ladataan…</p>
-  }
-
-  if (!user) {
-    return <AuthPage />
-  }
 
   function saalisTallennettu() {
     setPaivitysAvain((edellinen) => edellinen + 1)
@@ -34,8 +28,14 @@ function Sovellus() {
       </header>
 
       <main className="app-sisalto">
-        {valilehti === 'lisaa' && <CatchForm onTallennettu={saalisTallennettu} />}
+        {valilehti === 'lisaa' && (
+          <>
+            <ReissuPalkki />
+            <CatchForm onTallennettu={saalisTallennettu} />
+          </>
+        )}
         {valilehti === 'historia' && <CatchList paivitysAvain={paivitysAvain} />}
+        {valilehti === 'reissut' && <TripsList paivitysAvain={paivitysAvain} />}
         {valilehti === 'tilastot' && <Stats paivitysAvain={paivitysAvain} />}
       </main>
 
@@ -53,6 +53,12 @@ function Sovellus() {
           Historia
         </button>
         <button
+          className={valilehti === 'reissut' ? 'aktiivinen' : ''}
+          onClick={() => setValilehti('reissut')}
+        >
+          Reissut
+        </button>
+        <button
           className={valilehti === 'tilastot' ? 'aktiivinen' : ''}
           onClick={() => setValilehti('tilastot')}
         >
@@ -60,6 +66,24 @@ function Sovellus() {
         </button>
       </nav>
     </div>
+  )
+}
+
+function Sovellus() {
+  const { user, loading, signOut } = useAuth()
+
+  if (loading) {
+    return <p className="tila-teksti tila-koko-ruutu">Ladataan…</p>
+  }
+
+  if (!user) {
+    return <AuthPage />
+  }
+
+  return (
+    <TripsProvider>
+      <PaaNakyma signOut={signOut} />
+    </TripsProvider>
   )
 }
 

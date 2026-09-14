@@ -56,7 +56,7 @@
   border: none;
   padding: 0.6rem 0.25rem;
   border-radius: 12px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--vari-teksti-hento);
 }
 
@@ -64,6 +64,53 @@
   background: rgba(15, 110, 99, 0.1);
   color: var(--vari-paa);
   font-weight: 600;
+}
+
+.reissu-palkki {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--vari-pinta);
+  border: 1px dashed var(--vari-reunaviiva);
+  border-radius: 14px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.reissu-palkki input {
+  flex: 1;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--vari-reunaviiva);
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+
+.reissu-palkki button {
+  padding: 0.6rem 0.9rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--vari-korostus);
+  color: white;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.reissu-palkki-aktiivinen {
+  border: none;
+  background: rgba(15, 110, 99, 0.1);
+}
+
+.reissu-palkki-tiedot {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.85rem;
+  color: var(--vari-paa-tumma);
+}
+
+.reissu-palkki-aktiivinen button {
+  background: var(--vari-paa);
 }
 
 .catch-form {
@@ -266,6 +313,91 @@
 .catch-item-tiedot strong {
   color: var(--vari-teksti);
   font-size: 1rem;
+}
+
+.trip-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.trip-card {
+  background: var(--vari-pinta);
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.trip-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.trip-card-header strong {
+  display: block;
+  font-size: 1.05rem;
+}
+
+.trip-card-paivamaara {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--vari-teksti-hento);
+}
+
+.trip-badge {
+  background: var(--vari-korostus);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.trip-card-rivi {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--vari-teksti-hento);
+  flex-wrap: wrap;
+}
+
+.trip-card-lajit {
+  justify-content: flex-start;
+}
+
+.trip-tag {
+  background: var(--vari-tausta);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.8rem;
+  color: var(--vari-teksti);
+}
+
+.trip-card-muistiinpanot {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--vari-teksti-hento);
+}
+
+.trip-lopeta-nappi {
+  align-self: flex-start;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--vari-reunaviiva);
+  border-radius: 10px;
+  background: var(--vari-tausta);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--vari-paa-tumma);
 }
 
 .stats-kortti {
