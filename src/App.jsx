@@ -12,7 +12,7 @@ function Sovellus() {
   const [paivitysAvain, setPaivitysAvain] = useState(0)
 
   if (loading) {
-    return <p className="tila-teksti tila-koko-ruutu">Ladataan...</p>
+    return <p className="tila-teksti tila-koko-ruutu">Ladataan…</p>
   }
 
   if (!user) {
@@ -27,7 +27,7 @@ function Sovellus() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Kalapaivakirja</h1>
+        <h1>Kalapäiväkirja</h1>
         <button className="kirjaudu-ulos" onClick={signOut}>
           Kirjaudu ulos
         </button>
@@ -44,7 +44,7 @@ function Sovellus() {
           className={valilehti === 'lisaa' ? 'aktiivinen' : ''}
           onClick={() => setValilehti('lisaa')}
         >
-          Lisaa
+          Lisää
         </button>
         <button
           className={valilehti === 'historia' ? 'aktiivinen' : ''}
