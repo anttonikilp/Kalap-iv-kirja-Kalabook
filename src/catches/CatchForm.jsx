@@ -44,7 +44,7 @@ export default function CatchForm({ onTallennettu }) {
 
   function haeSijainti() {
     if (!navigator.geolocation) {
-      setVirhe('Selain ei tue paikannusta. Kirjoita sijainti kasin.')
+      setVirhe('Selain ei tue paikannusta. Kirjoita sijainti käsin.')
       return
     }
 
@@ -59,7 +59,7 @@ export default function CatchForm({ onTallennettu }) {
         setHaetaanSijaintia(false)
       },
       () => {
-        setVirhe('Sijaintia ei saatu. Voit kirjoittaa sen kasin.')
+        setVirhe('Sijaintia ei saatu. Voit kirjoittaa sen käsin.')
         setHaetaanSijaintia(false)
       },
       { enableHighAccuracy: true, timeout: 10000 }
@@ -99,7 +99,7 @@ export default function CatchForm({ onTallennettu }) {
       setOnnistui(true)
       onTallennettu?.(uusiSaalis)
     } catch (err) {
-      setVirhe('Tallennus epaonnistui: ' + err.message)
+      setVirhe('Tallennus epäonnistui: ' + err.message)
     } finally {
       setTallennetaan(false)
     }
@@ -124,7 +124,7 @@ export default function CatchForm({ onTallennettu }) {
       </div>
 
       <label className="kuva-valinta">
-        Lisaa kuva
+        Lisää kuva
         <input
           ref={tiedostoInput}
           type="file"
@@ -139,7 +139,7 @@ export default function CatchForm({ onTallennettu }) {
       )}
 
       <details className="lisatiedot">
-        <summary>Lisaa tarkempia tietoja (valinnainen)</summary>
+        <summary>Lisää tarkempia tietoja (valinnainen)</summary>
 
         <label>
           Paino (kg)
@@ -179,7 +179,7 @@ export default function CatchForm({ onTallennettu }) {
           <div className="sijainti-rivi">
             <input
               type="text"
-              placeholder="esim. Nasijarvi"
+              placeholder="esim. Näsijärvi"
               value={lomake.sijainti_teksti}
               onChange={(e) => paivita('sijainti_teksti', e.target.value)}
             />

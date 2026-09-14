@@ -30,7 +30,7 @@ export default function Stats({ paivitysAvain }) {
   if (lataa) return <p className="tila-teksti">Lasketaan tilastoja...</p>
   if (virhe) return <p className="lomake-virhe">Virhe: {virhe}</p>
   if (saaliit.length === 0) {
-    return <p className="tila-teksti">Ei viela tilastoja - lisaa ensin saaliita.</p>
+    return <p className="tila-teksti">Ei vielä tilastoja - lisää ensin saaliita.</p>
   }
 
   const maaraLajeittain = {}
@@ -54,10 +54,10 @@ export default function Stats({ paivitysAvain }) {
 
       <div className="stats-kortti">
         <span className="stats-luku">{saaliit.length}</span>
-        <span>saalista yhteensa</span>
+        <span>saalista yhteensä</span>
       </div>
 
-      <h3>Maara lajeittain</h3>
+      <h3>Määrä lajeittain</h3>
       <ul className="stats-lista">
         {Object.entries(maaraLajeittain)
           .sort((a, b) => b[1] - a[1])
@@ -71,7 +71,7 @@ export default function Stats({ paivitysAvain }) {
 
       <h3>Suurin saalis lajeittain (paino)</h3>
       {Object.keys(suurinLajeittain).length === 0 ? (
-        <p className="tila-teksti">Lisaa paino saaliille nahdaksesi ennatykset.</p>
+        <p className="tila-teksti">Lisää paino saaliille nähdäksesi ennätykset.</p>
       ) : (
         <ul className="stats-lista">
           {Object.entries(suurinLajeittain).map(([laji, saalis]) => (

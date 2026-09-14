@@ -30,7 +30,7 @@ export default function CatchList({ paivitysAvain }) {
   if (lataa) return <p className="tila-teksti">Ladataan saaliita...</p>
   if (virhe) return <p className="lomake-virhe">Virhe: {virhe}</p>
   if (saaliit.length === 0) {
-    return <p className="tila-teksti">Ei viela saaliita. Lisaa ensimmainen saaliisi!</p>
+    return <p className="tila-teksti">Ei vielä saaliita. Lisää ensimmäinen saaliisi!</p>
   }
 
   return (
