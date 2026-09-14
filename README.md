@@ -2,12 +2,13 @@
 
 Mobiili edella toimiva kalastuspaivakirja. Kirjaudu sisaan, kirjaa saalis
 muutamalla napautuksella ja seuraa omia tilastojasi. Voit niputtaa saaliit
-yhteen kalareissuksi ja lisata kavereita kayttajanimella. Tausta on Supabase
-(tietokanta, kirjautuminen, kuvien tallennus).
+yhteen kalareissuksi, lisata kavereita kayttajanimella ja kilpailla
+kavereiden kanssa yksinkertaisissa kisoissa. Tausta on Supabase (tietokanta,
+kirjautuminen, kuvien tallennus).
 
 Koodi on jaoteltu omiin kansioihin (`src/auth`, `src/catches`, `src/trips`,
-`src/friends`, `src/stats`), jotta esim. kisat tai ilmoitukset on helppo
-lisata myohemmin ilman etta olemassa olevaa koodia tarvitsee purkaa.
+`src/friends`, `src/competitions`, `src/stats`), jotta uusia ominaisuuksia on
+helppo lisata myohemmin ilman etta olemassa olevaa koodia tarvitsee purkaa.
 
 ## 1. Luo Supabase-projekti
 
@@ -24,8 +25,9 @@ lisata myohemmin ilman etta olemassa olevaa koodia tarvitsee purkaa.
 2. Kopioi **koko** tiedoston sisalto.
 3. Liita se Supabasen SQL Editoriin ja paina **Run**.
 
-Tama luo kaiken kerralla: `saaliit`-, `reissut`-, `profiilit`- ja
-`kaverit`-taulut, RLS-kaytannot seka `saalis-kuvat`-storage-bucketin.
+Tama luo kaiken kerralla: `saaliit`-, `reissut`-, `profiilit`-, `kaverit`-,
+`kisat`-, `kisa_osallistujat`- ja `kisa_saaliit`-taulut, RLS-kaytannot,
+tulostaulukkofunktion seka `saalis-kuvat`-storage-bucketin.
 
 ### Sinulla on jo aiempi asennus
 
@@ -34,12 +36,14 @@ Aja **vain puuttuvat** migraatiot jarjestyksessa kansiosta
 
 1. Jos taulua `reissut` ei viela ole:
    [`0002_reissut.sql`](supabase/migrations/0002_reissut.sql)
-2. Jos taulua `profiilit` tai `kaverit` ei viela ole:
+2. Jos tauluja `profiilit`/`kaverit` ei viela ole:
    [`0003_kaverit.sql`](supabase/migrations/0003_kaverit.sql)
+3. Jos tauluja `kisat`/`kisa_osallistujat`/`kisa_saaliit` ei viela ole:
+   [`0004_kisat.sql`](supabase/migrations/0004_kisat.sql)
 
 Avaa tiedosto, kopioi koko sisalto Supabasen SQL Editoriin ja paina **Run**.
-Jarjestys on tarkea, koska `0003_kaverit.sql` viittaa `saaliit`-tauluun,
-joka on luotu pohjaskeemassa.
+Jarjestys on tarkea: `0004_kisat.sql` vaatii etta `0003_kaverit.sql`
+(profiilit- ja kaverit-taulut) on jo ajettu.
 
 Kaikki skriptit on turvallista ajaa uudelleen tarvittaessa.
 
@@ -48,9 +52,7 @@ Kaikki skriptit on turvallista ajaa uudelleen tarvittaessa.
 1. Avaa Supabase-projektissa **Project Settings -> API**.
 2. Kopioi **Project URL** (nayttaa talta: `https://xxxxxxxx.supabase.co`).
 3. Kopioi **anon / public** -avain (Supabasen uudemmassa
-   kayttoliittymassa tama voi olla nimella "publishable key"). Tama
-   avain on tarkoitettu kaytettavaksi selaimessa, joten sen paljastuminen
-   ei ole tietoturvaongelma - tietoturva tulee RLS-kaytannoista.
+   kayttoliittymassa tama voi olla nimella "publishable key").
 
 ## 4. Aseta ymparistomuuttujat
 
@@ -65,133 +67,97 @@ Kaikki skriptit on turvallista ajaa uudelleen tarvittaessa.
    VITE_SUPABASE_ANON_KEY=liita-tahan-oma-avaimesi
    ```
 
-3. `.env`-tiedostoa **ei** koskaan commitoida gitiin (se on jo
-   `.gitignore`-tiedostossa) - avaimet pysyvat vain omalla koneellasi.
+3. `.env`-tiedostoa **ei** koskaan commitoida gitiin.
 
-### Tuotanto / julkaisu (esim. Vercel, Netlify tai muu hosting)
+### Tuotanto / julkaisu
 
-Aseta samat kaksi ymparistomuuttujaa hostingpalvelun asetuksista
-(esim. Vercelissa: Project Settings -> Environment Variables):
-
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
-
-Muista rakentaa/deployata sovellus uudelleen muuttujien lisaamisen
-jalkeen.
+Aseta samat kaksi ymparistomuuttujaa hostingpalvelun asetuksista ja
+rakenna/deployata sovellus uudelleen sen jalkeen.
 
 ## 5. Asenna riippuvuudet ja kaynnista sovellus
-
-Vaaditaan [Node.js](https://nodejs.org/) (versio 18 tai uudempi).
 
 ```
 npm install
 npm run dev
 ```
 
-Avaa selaimessa osoite, jonka komento tulostaa (yleensa
-`http://localhost:5173`).
-
-Muita komentoja:
-
-- `npm run build` - luo tuotantoversion `dist/`-kansioon.
-- `npm run preview` - nayttaa build-version paikallisesti.
-
 ## 6. Kayttoonotto sovelluksessa
 
-1. Avaa sovellus selaimessa ja rekisteroidy sahkopostilla ja salasanalla.
-2. Supabase lahettaa oletuksena vahvistussahkopostin - vahvista tili
-   linkista ja kirjaudu sisaan.
-   - Jos haluat testata nopeammin ilman sahkopostivahvistusta, voit
-     kayda Supabasessa kohdassa **Authentication -> Providers -> Email**
-     ja kytkea "Confirm email" pois paalta (kannattaa ottaa takaisin
-     paalle ennen oikeaa julkaisua).
-3. Kirjautumisen jalkeen voit heti lisata saaliin: valitse laji ja paina
-   "Tallenna saalis". Muut kentat (paino, pituus, sijainti, viehe,
-   kalastustapa, kuva, muistiinpanot) loytyvat kohdasta "Lisaa tarkempia
-   tietoja" eivatka ole pakollisia.
-4. "Lisaa"-valilehden ylaosassa voit aloittaa reissun (paikka on
-   valinnainen, aloitusaika kirjataan automaattisesti). Kaynnissa olevan
-   reissun aikana lisatyt saaliit liittyvat reissuun automaattisesti.
-5. "Historia"-valilehdella nakyvat omat saaliit uusin ensin, pikkukuvan
-   kanssa.
-6. "Reissut"-valilehdella nakyvat omat reissut uusin ensin koosteineen.
-7. "Tilastot"-valilehdella nakyvat saaliiden kokonaismaara, maara
-   lajeittain ja suurin saalis (painon mukaan) kutakin lajia kohden.
-8. "Kaverit"-valilehdella:
-   - Ensimmaisella kaynnilla sovellus pyytaa valitsemaan **kayttajanimen**
-     (3-20 merkkia, pienet kirjaimet, numerot tai alaviiva). Kayttajanimi
-     nakyy kavereille - sahkopostiosoitetta ei nayteta koskaan kenellekaan.
-   - "Lisaa kaveri" -kohtaan kirjoitetaan toisen kayttajan tarkka
-     kayttajanimi ja lahetetaan pyynto.
-   - "Saapuneet pyynnot" voi hyvaksya tai hylata.
-   - "Lahetetyt pyynnot" (odottaa vastausta) voi perua.
-   - "Kaverit"-listassa nakyvat hyvaksytyt kaverit, ja kaverin voi poistaa.
-   - Tama versio kattaa vain yhteyksien luonnin - kavereiden saaliita tai
-     tilastoja ei viela nayteta, eika kisoja ole viela olemassa.
+1. Rekisteroidy, vahvista sahkopostisi ja kirjaudu sisaan.
+2. Lisaa saaliita, aloita reissuja ja seuraa tilastojasi kuten ennenkin.
+3. "Kaverit"-valilehdella valitse kayttajanimi ja lisaa kavereita.
+4. "Kisat"-valilehdella:
+   - **Luo uusi kisa**: anna nimi, kohde (yksi laji tai kaikki lajit),
+     mittari (suurin kala painon mukaan TAI eniten kaloja), laskentatapa
+     (Automaattinen tai Ilmoitettavat) seka alku- ja loppupaiva. Sina
+     liityt automaattisesti mukaan omaan kisaasi.
+   - Avaa luomasi kisa ja **kutsu kavereita** - vain hyvaksytyt kaverisi
+     nakyvat kutsuttavina.
+   - Kutsutut nakevat kutsun "Saapuneet kisakutsut" -kohdassa ja voivat
+     hyvaksya tai hylata sen.
+   - "Automaattinen"-kisassa kaikki osallistujan kisa-aikana kirjaamat,
+     kohteeseen sopivat saaliit lasketaan mukaan itsestaan.
+   - "Ilmoitettavat"-kisassa osallistuja liittaa itse haluamansa saaliit
+     kisan sivulta kohdasta "Liita omia saaliita kisaan" (nakyy vain
+     kisan ajan omista, kohteeseen sopivista saaliista).
+   - Kisan sivulla nakyy tulostaulukko, joka paivittyy valitun mittarin
+     mukaan paremmuusjarjestyksessa. Tulostaulukossa nakyy vain
+     kayttajanimi/nayttonimi ja tulos - ei sijaintia, kuvia tai muita
+     saaliin tietoja.
+   - Omat kisat nakyvat ryhmiteltyna: Kaynnissa / Tulevat / Paattyneet.
 
 ## Projektin rakenne
 
 ```
 src/
   main.jsx                  Sovelluksen kaynnistys
-  App.jsx                   Valilehdet (Lisaa / Historia / Reissut / Tilastot / Kaverit)
+  App.jsx                   Valilehdet (Lisaa / Historia / Reissut / Tilastot / Kaverit / Kisat)
   App.css / index.css       Tyylit (mobiili edella)
   lib/
     supabaseClient.js        Supabase-yhteyden alustus ymparistomuuttujista
-  auth/
-    AuthContext.jsx          Kirjautumistilan hallinta (React Context)
-    AuthPage.jsx             Kirjautumis- ja rekisterointilomake
-  catches/
-    species.js               Lajit ja kalastustavat vakioina
-    catchService.js          Supabase-kyselyt: hae, lisaa, poista saalis + kuvan lataus
-    CatchForm.jsx             Nopea lomake uuden saaliin lisaamiseen
-    CatchList.jsx             Oma saalishistoria pikkukuvineen
-  trips/
-    tripService.js            Supabase-kyselyt: hae reissut/aktiivinen reissu, aloita, lopeta
-    TripsContext.jsx          Kaynnissa olevan reissun tilanhallinta (React Context)
-    ReissuPalkki.jsx          Aloita/lopeta-reissu-palkki Lisaa-nakymassa
-    TripCard.jsx              Yhden reissun koostekortti
-    TripsList.jsx             Reissut-valilehden lista
-  friends/
-    profileService.js         Supabase-kyselyt: oma profiili, kayttajanimen asetus, haku nimella
-    friendService.js          Supabase-kyselyt: pyynnot, hyvaksynta, poisto, kaverilista
-    UsernameForm.jsx          Kayttajanimen (ja nayttonimien) asetuslomake
-    FriendRequestItem.jsx     Yhden kaverin/pyynnon rivi toimintonappeineen
-    FriendsView.jsx           Kaverit-valilehden kokoava nakyma
-  stats/
-    Stats.jsx                 Perustilastot (maara, lajijakauma, ennatykset)
+  auth/                      Kirjautuminen (ei muutettu tassa PR:ssa)
+  catches/                   Saaliin lisays ja historia (ei muutettu tassa PR:ssa)
+  trips/                     Kalareissut (ei muutettu tassa PR:ssa)
+  friends/                   Profiilit ja kaverisuhteet (ei muutettu tassa PR:ssa)
+  competitions/
+    constants.js              Mittarien ja laskentatapojen vakiot
+    dateUtils.js              Paivamaaramuotoilu ja kisan tilan paattely
+    competitionService.js     Supabase-kyselyt: kisat, kutsut, osallistujat, tulostaulukko-RPC
+    CreateCompetitionForm.jsx Kisan luontilomake
+    CompetitionInvites.jsx    Saapuneet kisakutsut (hyvaksy/hylkaa)
+    InviteFriendPanel.jsx     Hyvaksyttyjen kavereiden kutsuminen kisaan
+    CompetitionList.jsx       Omat kisat ryhmiteltyna (kaynnissa/tulevat/paattyneet)
+    CompetitionDetail.jsx     Kisan tiedot, tulostaulukko ja saaliiden liittaminen
+    CompetitionsView.jsx      Kisat-valilehden kokoava nakyma
+  stats/                     Perustilastot (ei muutettu tassa PR:ssa)
 supabase/
-  schema.sql                 Koko tietokantarakenne (taulut, RLS-kaytannot, storage-bucket, triggerit)
+  schema.sql                 Koko tietokantarakenne (taulut, RLS-kaytannot, funktiot, storage-bucket)
   migrations/
-    0002_reissut.sql          Pelkka reissu-ominaisuuden lisays olemassa olevaan asennukseen
-    0003_kaverit.sql          Pelkka profiilit/kaverit-ominaisuuden lisays olemassa olevaan asennukseen
+    0002_reissut.sql
+    0003_kaverit.sql
+    0004_kisat.sql             Kisat, osallistujat, ilmoitettavat saaliit, tulostaulukko-RPC
 ```
 
-Rakenne on tarkoituksella modulaarinen: `auth`, `catches`, `trips`, `friends`
-ja `stats` eivat riipu toisistaan enempaa kuin valttamatonta, joten esim.
-kisa- tai ilmoitusominaisuudet on helppo lisata omina moduuleinaan
-myohemmin koskematta olemassa olevaan koodiin.
+## Huomioita kisat-ominaisuudesta
 
-## Huomioita
-
-- GPS-nappi ("GPS") pyytaa selaimelta lupaa paikannukseen - selain kysyy
-  tahan luvan erikseen. Jos paikannus ei ole kaytossa, sijainnin voi
-  kirjoittaa kasin.
-- Kuvat tallennetaan julkiseen Storage-bucketiin nimella
-  `{kayttajan_id}/....`, mutta vain omistaja voi lisata/muokata/poistaa
-  omia kuviaan - tama on toteutettu Storagen RLS-kaytannoilla.
-- Kayttajalla voi olla vain yksi kaynnissa oleva reissu kerrallaan
-  (tietokantatasolla varmistettu), mutta reissuja voi olla loputon maara
-  ja saaliin voi aina lisata myos ilman reissua.
-- Jokaiselle kayttajalle luodaan profiilirivi automaattisesti
-  (tietokantatrigger), mutta kayttajanimi jaa tyhjaksi kunnes kayttaja
-  valitsee sen itse Kaverit-valilehdella.
-- Profiileista on julkisesti (kirjautuneille) luettavissa vain
-  kayttajanimi ja nayttonimi - sahkopostiosoitetta ei tallenneta eika
-  koskaan nayteta muille kayttajille.
-- Kaveripyynto voidaan lahettaa vain kerran samalle parille suuntaan tai
-  toiseen (tietokantatasolla varmistettu uniikilla indeksilla), ja vain
-  pyynnon vastaanottaja voi hyvaksya sen.
-- Kaverit, kisat ja ilmoitukset on jatetty tarkoituksella pois (kaverit-
-  ominaisuudesta on toteutettu tassa vaiheessa vain yhteyksien luonti) -
-  ne on helppo lisata myohemmin omina moduuleinaan.
+- **Tietoturva**: kisan tiedot ja tulostaulukon nakevat vain kisan
+  osallistujat. Vain luoja voi muokata/poistaa kisan ja kutsua
+  osallistujia. Osallistuja voi liittaa kisaan vain omia saaliitaan, ja
+  vain jos on hyvaksytty osallistuja. Tulostaulukko lasketaan tietokannan
+  puolella turvallisella funktiolla, joka palauttaa vain kayttajanimen,
+  nayttonimen ja lasketun tuloksen - ei koskaan sijaintia, kuvia tai
+  muita saaliin yksityiskohtia.
+- Koska `catches`-, `trips`-, `friends`-, `stats`- ja `auth`-moduuleja ei
+  saanut muuttaa, saaliin liittaminen "ilmoitettavaan" kisaan tehdaan
+  kisan omalta sivulta ("Liita omia saaliita kisaan") eika Historia-
+  valilehdelta - toiminnallisuus on sama, sijainti sovelluksessa vain
+  hieman eri kuin alun perin kuvattu.
+- Kisan alku- ja loppupaiva ovat paivan tarkkuudella (ei kellonaikaa),
+  mika sopii yksinkertaiseen kisaan.
+- Painoa ei vaadita saaliilta (se on aina valinnainen tieto), joten
+  "Suurin kala" -mittarilla laskettava kisa nayttaa viivan (-) niille
+  osallistujille, joiden saaliille ei ole kirjattu painoa.
+- Tama versio kattaa tietoisesti vain yksinkertaisen kisan: ei piste-,
+  kausi-, joukkue- eika premium-kisoja. Kisan muokkaus- ja
+  poistotoiminnot on valmiina tietoturvassa (RLS), mutta niille ei ole
+  viela kayttoliittymaa - ne on helppo lisata myohemmin.
