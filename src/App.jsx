@@ -3,40 +3,36 @@ import { AuthProvider, useAuth } from './auth/AuthContext.jsx'
 import AuthPage from './auth/AuthPage.jsx'
 import { TripsProvider } from './trips/TripsContext.jsx'
 import ReissuPalkki from './trips/ReissuPalkki.jsx'
-import TripsList from './trips/TripsList.jsx'
 import CatchForm from './catches/CatchForm.jsx'
-import CatchList from './catches/CatchList.jsx'
-import Stats from './stats/Stats.jsx'
 import FriendsView from './friends/FriendsView.jsx'
 import CompetitionsView from './competitions/CompetitionsView.jsx'
 import NotificationBell from './notifications/NotificationBell.jsx'
+import ProfileView from './profile/ProfileView.jsx'
 import {
   PlusIcon,
-  ListIcon,
-  CompassIcon,
-  ChartIcon,
   UsersIcon,
   TrophyIcon,
+  UserIcon,
   LogOutIcon,
 } from './components/icons.jsx'
 import './App.css'
 
 const VALILEHDET = [
   { id: 'lisaa', nimi: 'Lisää', Ikoni: PlusIcon },
-  { id: 'historia', nimi: 'Historia', Ikoni: ListIcon },
-  { id: 'reissut', nimi: 'Reissut', Ikoni: CompassIcon },
-  { id: 'tilastot', nimi: 'Tilastot', Ikoni: ChartIcon },
-  { id: 'kaverit', nimi: 'Kaverit', Ikoni: UsersIcon },
   { id: 'kisat', nimi: 'Kisat', Ikoni: TrophyIcon },
+  { id: 'kaverit', nimi: 'Kaverit', Ikoni: UsersIcon },
+  { id: 'profiili', nimi: 'Profiili', Ikoni: UserIcon },
 ]
 
 function PaaNakyma({ signOut }) {
   const [valilehti, setValilehti] = useState('lisaa')
   const [paivitysAvain, setPaivitysAvain] = useState(0)
+  const [profiiliOsio, setProfiiliOsio] = useState('historia')
 
   function saalisTallennettu() {
     setPaivitysAvain((edellinen) => edellinen + 1)
-    setValilehti('historia')
+    setProfiiliOsio('historia')
+    setValilehti('profiili')
   }
 
   return (
@@ -59,11 +55,15 @@ function PaaNakyma({ signOut }) {
             <CatchForm onTallennettu={saalisTallennettu} />
           </>
         )}
-        {valilehti === 'historia' && <CatchList paivitysAvain={paivitysAvain} />}
-        {valilehti === 'reissut' && <TripsList paivitysAvain={paivitysAvain} />}
-        {valilehti === 'tilastot' && <Stats paivitysAvain={paivitysAvain} />}
-        {valilehti === 'kaverit' && <FriendsView />}
         {valilehti === 'kisat' && <CompetitionsView />}
+        {valilehti === 'kaverit' && <FriendsView />}
+        {valilehti === 'profiili' && (
+          <ProfileView
+            paivitysAvain={paivitysAvain}
+            osio={profiiliOsio}
+            onOsioChange={setProfiiliOsio}
+          />
+        )}
       </main>
 
       <nav className="app-nav">
