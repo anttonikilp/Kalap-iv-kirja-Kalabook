@@ -8,9 +8,9 @@ ilmoituksia tarkeista tapahtumista. Tausta on Supabase (tietokanta,
 kirjautuminen, kuvien tallennus).
 
 Koodi on jaoteltu omiin kansioihin (`src/auth`, `src/catches`, `src/trips`,
-`src/friends`, `src/competitions`, `src/stats`, `src/notifications`), jotta
-uusia ominaisuuksia on helppo lisata myohemmin ilman etta olemassa olevaa
-koodia tarvitsee purkaa.
+`src/friends`, `src/competitions`, `src/stats`, `src/notifications`,
+`src/profile`), jotta uusia ominaisuuksia on helppo lisata myohemmin ilman
+etta olemassa olevaa koodia tarvitsee purkaa.
 
 ## 1. Luo Supabase-projekti
 
@@ -105,9 +105,21 @@ npm run dev
 ## 6. Kayttoonotto sovelluksessa
 
 1. Rekisteroidy, vahvista sahkopostisi ja kirjaudu sisaan.
-2. Lisaa saaliita, aloita reissuja ja seuraa tilastojasi kuten ennenkin.
-3. "Kaverit"-valilehdella valitse kayttajanimi ja lisaa kavereita.
-4. "Kisat"-valilehdella:
+2. Alapalkissa on nelja paavalilehtea: **Lisaa**, **Kisat**, **Kaverit**
+   ja **Profiili**.
+3. "Lisaa"-valilehdella kirjaat saaliita ja aloitat reissuja kuten
+   ennenkin.
+4. "Profiili"-valilehti kokoaa yhteen kolme aiempaa nakymaa ylalaidan
+   segmenttivalitsimella:
+   - **Historia**: kaikki kirjaamasi saaliit.
+   - **Reissut**: kalareissujen hallinta.
+   - **Tilastot**: yhteenveto saaliistasi.
+
+   Kun tallennat uuden saaliin "Lisaa"-valilehdella, sovellus vie sinut
+   automaattisesti Profiiliin Historia-valilehti avattuna, aivan kuten
+   ennenkin siirryttiin suoraan Historiaan.
+5. "Kaverit"-valilehdella valitse kayttajanimi ja lisaa kavereita.
+6. "Kisat"-valilehdella:
    - **Luo uusi kisa**: anna nimi, kohde (yksi laji tai kaikki lajit),
      mittari (suurin kala painon mukaan TAI eniten kaloja), laskentatapa
      (Automaattinen tai Ilmoitettavat) seka alku- ja loppupaiva. Sina
@@ -126,7 +138,7 @@ npm run dev
      kayttajanimi/nayttonimi ja tulos - ei sijaintia, kuvia tai muita
      saaliin tietoja.
    - Omat kisat nakyvat ryhmiteltyna: Kaynnissa / Tulevat / Paattyneet.
-5. Ylapalkin **kellokuvake** nayttaa lukemattomien ilmoitusten maaran.
+7. Ylapalkin **kellokuvake** nayttaa lukemattomien ilmoitusten maaran.
    Painamalla kelloa avautuu lista tuoreimmista ilmoituksista (lukemattomat
    ensin, sitten "Aiemmat"). Ilmoitusta painamalla se merkitaan luetuksi ja
    tarvittaessa siirryt liittyvalle valilehdelle (esim. kaveripyynto ->
@@ -138,13 +150,13 @@ npm run dev
 ```
 src/
   main.jsx                  Sovelluksen kaynnistys
-  App.jsx                   Valilehdet (Lisaa / Historia / Reissut / Tilastot / Kaverit / Kisat)
+  App.jsx                   Alapalkin valilehdet (Lisaa / Kisat / Kaverit / Profiili)
   App.css / index.css       Tyylit (mobiili edella)
   lib/
     supabaseClient.js        Supabase-yhteyden alustus ymparistomuuttujista
   auth/                      Kirjautuminen
-  catches/                   Saaliin lisays ja historia
-  trips/                     Kalareissut
+  catches/                   Saaliin lisays ja historia (nayttyy Profiili-valilehdella)
+  trips/                     Kalareissut (nayttyy Profiili-valilehdella)
   friends/                   Profiilit ja kaverisuhteet
   competitions/
     constants.js              Mittarien ja laskentatapojen vakiot
@@ -156,11 +168,13 @@ src/
     CompetitionList.jsx       Omat kisat ryhmiteltyna (kaynnissa/tulevat/paattyneet)
     CompetitionDetail.jsx     Kisan tiedot, tulostaulukko ja saaliiden liittaminen
     CompetitionsView.jsx      Kisat-valilehden kokoava nakyma
-  stats/                     Perustilastot
+  stats/                     Perustilastot (nayttyy Profiili-valilehdella)
   notifications/
     notificationService.js    Supabase-kyselyt: ilmoitusten haku, lukemattomien maara, luetuksi merkitseminen
     NotificationBell.jsx      Ylapalkin kellokuvake ja lukemattomien maaran paivitys
     NotificationPanel.jsx     Avautuva ilmoituslista (lukemattomat/luetut)
+  profile/
+    ProfileView.jsx           Profiili-valilehti: kokoaa Historia/Reissut/Tilastot segmenttivalitsimen taakse
 supabase/
   schema.sql                 Koko tietokantarakenne (taulut, RLS-kaytannot, funktiot, storage-bucket)
   migrations/
@@ -171,6 +185,20 @@ supabase/
     0006_kovenna_security_definer.sql Lukitsee SECURITY DEFINER -funktioiden search_path-asetukset
     0007_ilmoitukset.sql              Sovelluksen sisaiset ilmoitukset: taulu, RLS ja luontitriggerit
 ```
+
+## Huomioita navigaatiouudistuksesta
+
+- Tama oli puhdas navigaatio-/ulkoasumuutos: minkaan nakyman sisalto,
+  toiminnot, tietokantakutsut tai lomakkeet eivat muuttuneet. Historia-,
+  Reissut- ja Tilastot-komponentit (`src/catches/CatchList.jsx`,
+  `src/trips/TripsList.jsx`, `src/stats/Stats.jsx`) ovat tismalleen
+  ennallaan - ne vain renderoidaan nyt `src/profile/ProfileView.jsx`:n
+  sisalla Profiili-valilehden segmenttivalitsimen takana.
+- Alapalkissa on nyt kuuden valilehden sijaan nelja: Lisaa, Kisat,
+  Kaverit, Profiili. Aktiivinen valilehti erottuu varilla, ja kaikkien
+  alapalkin ja Profiilin segmenttinappien kosketusalue on vahintaan 48px.
+- Ilmoituskello toimii ylapalkissa taysin ennallaan; kaveripyynto- ja
+  kisailmoitukset vievat edelleen Kaverit- ja Kisat-valilehdille.
 
 ## Huomioita kisat-ominaisuudesta
 
