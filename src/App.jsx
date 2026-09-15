@@ -9,6 +9,7 @@ import CatchList from './catches/CatchList.jsx'
 import Stats from './stats/Stats.jsx'
 import FriendsView from './friends/FriendsView.jsx'
 import CompetitionsView from './competitions/CompetitionsView.jsx'
+import NotificationBell from './notifications/NotificationBell.jsx'
 import {
   PlusIcon,
   ListIcon,
@@ -42,10 +43,13 @@ function PaaNakyma({ signOut }) {
     <div className="app">
       <header className="app-header">
         <h1>Kalapäiväkirja</h1>
-        <button className="kirjaudu-ulos" onClick={signOut}>
-          <LogOutIcon size={16} />
-          Kirjaudu ulos
-        </button>
+        <div className="app-header-oikea">
+          <NotificationBell onNavigoi={setValilehti} />
+          <button className="kirjaudu-ulos" onClick={signOut}>
+            <LogOutIcon size={16} />
+            Kirjaudu ulos
+          </button>
+        </div>
       </header>
 
       <main className="app-sisalto">

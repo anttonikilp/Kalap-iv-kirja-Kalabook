@@ -2,13 +2,15 @@
 
 Mobiili edella toimiva kalastuspaivakirja. Kirjaudu sisaan, kirjaa saalis
 muutamalla napautuksella ja seuraa omia tilastojasi. Voit niputtaa saaliit
-yhteen kalareissuksi, lisata kavereita kayttajanimella ja kilpailla
-kavereiden kanssa yksinkertaisissa kisoissa. Tausta on Supabase (tietokanta,
+yhteen kalareissuksi, lisata kavereita kayttajanimella, kilpailla
+kavereiden kanssa yksinkertaisissa kisoissa ja saat sovelluksen sisaisia
+ilmoituksia tarkeista tapahtumista. Tausta on Supabase (tietokanta,
 kirjautuminen, kuvien tallennus).
 
 Koodi on jaoteltu omiin kansioihin (`src/auth`, `src/catches`, `src/trips`,
-`src/friends`, `src/competitions`, `src/stats`), jotta uusia ominaisuuksia on
-helppo lisata myohemmin ilman etta olemassa olevaa koodia tarvitsee purkaa.
+`src/friends`, `src/competitions`, `src/stats`, `src/notifications`), jotta
+uusia ominaisuuksia on helppo lisata myohemmin ilman etta olemassa olevaa
+koodia tarvitsee purkaa.
 
 ## 1. Luo Supabase-projekti
 
@@ -26,9 +28,10 @@ helppo lisata myohemmin ilman etta olemassa olevaa koodia tarvitsee purkaa.
 3. Liita se Supabasen SQL Editoriin ja paina **Run**.
 
 Tama luo kaiken kerralla valmiiksi korjattuna ja koventettuna: `saaliit`-,
-`reissut`-, `profiilit`-, `kaverit`-, `kisat`-, `kisa_osallistujat`- ja
-`kisa_saaliit`-taulut, RLS-kaytannot, apufunktiot, tulostaulukkofunktion
-seka `saalis-kuvat`-storage-bucketin.
+`reissut`-, `profiilit`-, `kaverit`-, `kisat`-, `kisa_osallistujat`-,
+`kisa_saaliit`- ja `ilmoitukset`-taulut, RLS-kaytannot, apufunktiot,
+tulostaulukkofunktion, ilmoitusten luontitriggerit seka
+`saalis-kuvat`-storage-bucketin.
 
 ### Sinulla on jo aiempi asennus
 
@@ -44,13 +47,20 @@ Aja **vain puuttuvat** migraatiot jarjestyksessa kansiosta
 4. Jos kisan luonti antaa virheen "infinite recursion detected in policy
    for relation kisat":
    [`0005_kisat_rls_korjaus.sql`](supabase/migrations/0005_kisat_rls_korjaus.sql)
-5. Aja aina viimeiseksi (kovensi migraation 0005 apufunktiot):
+5. Aja aina viimeiseksi ennen ilmoituksia (kovensi migraation 0005
+   apufunktiot):
    [`0006_kovenna_security_definer.sql`](supabase/migrations/0006_kovenna_security_definer.sql)
+6. Jos taulua `ilmoitukset` ei viela ole (sovelluksen sisaiset
+   ilmoitukset, kellokuvake ylapalkissa):
+   [`0007_ilmoitukset.sql`](supabase/migrations/0007_ilmoitukset.sql)
 
 Avaa tiedosto, kopioi koko sisalto Supabasen SQL Editoriin ja paina **Run**.
 Jarjestys on tarkea: `0004_kisat.sql` vaatii etta `0003_kaverit.sql`
 (profiilit- ja kaverit-taulut) on jo ajettu, `0005` vaatii etta `0004` on
-ajettu, ja `0006` vaatii etta `0005` on ajettu (se kovensi samat funktiot).
+ajettu, `0006` vaatii etta `0005` on ajettu (se kovensi samat funktiot), ja
+`0007_ilmoitukset.sql` vaatii etta `0002`-`0006` on jo ajettu (se kayttaa
+tauluja `profiilit`, `kaverit`, `kisat`, `kisa_osallistujat`, `kisa_saaliit`
+ja `saaliit`).
 
 Jos olet ajanut vasta `0004_kisat.sql`:n etka viela `0005`:tta, voit ajaa
 suoraan `0006_kovenna_security_definer.sql`:n heti `0005`:n jalkeen - se ei
@@ -63,7 +73,7 @@ Kaikki skriptit on turvallista ajaa uudelleen tarvittaessa.
 1. Avaa Supabase-projektissa **Project Settings -> API**.
 2. Kopioi **Project URL** (nayttaa talta: `https://xxxxxxxx.supabase.co`).
 3. Kopioi **anon / public** -avain (Supabasen uudemmassa
-   kayttoliittymassa tama voi olla nimella "publishable key").
+   kayttoliittymasta tama voi olla nimella "publishable key").
 
 ## 4. Aseta ymparistomuuttujat
 
@@ -116,6 +126,12 @@ npm run dev
      kayttajanimi/nayttonimi ja tulos - ei sijaintia, kuvia tai muita
      saaliin tietoja.
    - Omat kisat nakyvat ryhmiteltyna: Kaynnissa / Tulevat / Paattyneet.
+5. Ylapalkin **kellokuvake** nayttaa lukemattomien ilmoitusten maaran.
+   Painamalla kelloa avautuu lista tuoreimmista ilmoituksista (lukemattomat
+   ensin, sitten "Aiemmat"). Ilmoitusta painamalla se merkitaan luetuksi ja
+   tarvittaessa siirryt liittyvalle valilehdelle (esim. kaveripyynto ->
+   Kaverit-valilehti, kisatapahtuma -> Kisat-valilehti). "Merkitse kaikki
+   luetuiksi" nakyy vain kun lukemattomia on.
 
 ## Projektin rakenne
 
@@ -141,6 +157,10 @@ src/
     CompetitionDetail.jsx     Kisan tiedot, tulostaulukko ja saaliiden liittaminen
     CompetitionsView.jsx      Kisat-valilehden kokoava nakyma
   stats/                     Perustilastot
+  notifications/
+    notificationService.js    Supabase-kyselyt: ilmoitusten haku, lukemattomien maara, luetuksi merkitseminen
+    NotificationBell.jsx      Ylapalkin kellokuvake ja lukemattomien maaran paivitys
+    NotificationPanel.jsx     Avautuva ilmoituslista (lukemattomat/luetut)
 supabase/
   schema.sql                 Koko tietokantarakenne (taulut, RLS-kaytannot, funktiot, storage-bucket)
   migrations/
@@ -149,6 +169,7 @@ supabase/
     0004_kisat.sql                    Kisat, osallistujat, ilmoitettavat saaliit, tulostaulukko-RPC
     0005_kisat_rls_korjaus.sql        Korjaa kisojen RLS-kaytantojen aareton rekursio
     0006_kovenna_security_definer.sql Lukitsee SECURITY DEFINER -funktioiden search_path-asetukset
+    0007_ilmoitukset.sql              Sovelluksen sisaiset ilmoitukset: taulu, RLS ja luontitriggerit
 ```
 
 ## Huomioita kisat-ominaisuudesta
@@ -180,3 +201,30 @@ supabase/
   kausi-, joukkue- eika premium-kisoja. Kisan muokkaus- ja
   poistotoiminnot on valmiina tietoturvassa (RLS), mutta niille ei ole
   viela kayttoliittymaa - ne on helppo lisata myohemmin.
+
+## Huomioita ilmoitukset-ominaisuudesta
+
+- **Tietoturva**: `ilmoitukset`-taululla ei ole lainkaan
+  INSERT-kaytantoa, joten kayttaja ei voi koskaan luoda ilmoituksia
+  suoraan itselleen tai muille - ainoastaan viisi tarkasti rajattua
+  SECURITY DEFINER -triggeria (kaverin saalis, kaveripyynto saapui,
+  kaveripyynto hyvaksyttiin, kisakutsu, karkipaikan ohitus) voivat lisata
+  rivin, ja niidenkin search_path on lukittu tyhjaksi migraation 0006
+  tapaan. Kayttaja nakee, merkitsee luetuksi ja poistaa vain omat
+  ilmoituksensa. Erillinen trigger estaa myos jalkikateen muuttamasta
+  mitaan muuta kuin `luettu`-kenttaa.
+- **Yksityisyys**: ilmoitustekstit eivat koskaan sisalla tarkkaa
+  sijaintia - vain esim. lajin ja tekijan nimen.
+- Kelloa paivitetaan kevyella 45 sekunnin valein tapahtuvalla kyselylla
+  (ei Supabase Realtime -tilausta), mika riittaa "sovelluksen sisaiselle"
+  ilmoitukselle ilman lisamonimutkaisuutta.
+- "Kaveri kirjasi uuden saaliin" -ilmoitusta painamalla ei viela avaudu
+  omaa nakymaa, koska sovelluksessa ei ylipaataan viela ole nakymaa
+  kaverin yksittaisille saaliille (kaverit-ominaisuus rajattiin
+  tietoisesti vain yhteyksien luontiin) - ilmoitus vain merkitaan
+  luetuksi. Muut ilmoitustyypit vievat Kaverit- tai Kisat-valilehdelle.
+- "Kilpailussa joku ohitti sinut karjessa" -tunnistus vertaa johtajaa
+  juuri ennen ja juuri jalkeen uuden saaliin. Jos karjessa on tasapeli,
+  "johtaja" valitaan tulos- ja kayttaja-id-jarjestyksella, joten
+  satunnaisissa tasapeleissa ilmoitus ei aina osu tarkalleen oikeaan
+  henkiloon - karjen todellinen vaihtuminen kuitenkin havaitaan aina.
