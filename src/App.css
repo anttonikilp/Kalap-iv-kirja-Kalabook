@@ -194,10 +194,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.2rem;
   background: none;
   border: none;
   padding: 0.45rem 0.1rem;
+  min-height: 48px;
   border-radius: 10px;
   font-size: 0.64rem;
   font-weight: 600;
@@ -715,6 +717,74 @@ button {
 
 .stats-lista li:last-child {
   border-bottom: none;
+}
+
+/* ---------- Profiili ---------- */
+
+.profiili-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vali-l);
+}
+
+.profiili-otsikko {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.profiili-otsikko h2 {
+  margin: 0;
+}
+
+.profiili-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--vari-paa);
+  color: #f4fbfa;
+  flex-shrink: 0;
+}
+
+.profiili-kayttajanimi {
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+  color: var(--vari-teksti-himmea);
+}
+
+.profiili-segmentit {
+  display: flex;
+  gap: 0.3rem;
+  background: var(--vari-pinta);
+  border: 1px solid var(--vari-reunaviiva);
+  border-radius: var(--sade-m);
+  padding: 0.3rem;
+}
+
+.profiili-segmentit button {
+  flex: 1;
+  gap: 0.35rem;
+  padding: 0.55rem 0.4rem;
+  min-height: 48px;
+  border: none;
+  border-radius: var(--sade-s);
+  background: transparent;
+  color: var(--vari-teksti-hento);
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+.profiili-segmentit button.aktiivinen {
+  background: var(--vari-paa-hento);
+  color: var(--vari-paa-vaalea);
+}
+
+.profiili-sisalto {
+  display: flex;
+  flex-direction: column;
 }
 
 /* ---------- Kayttajanimi ja kaverit ---------- */
