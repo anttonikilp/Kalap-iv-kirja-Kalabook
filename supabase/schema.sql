@@ -190,7 +190,7 @@ create or replace function public.kasittele_uusi_kayttaja()
 returns trigger
 language plpgsql
 security definer
-set search_path = public
+set search_path = ''
 as $$
 begin
   insert into public.profiilit (id)
@@ -322,7 +322,7 @@ create or replace function public.lisaa_luoja_osallistujaksi()
 returns trigger
 language plpgsql
 security definer
-set search_path = public
+set search_path = ''
 as $$
 begin
   insert into public.kisa_osallistujat (kisa_id, kayttaja_id, tila)
@@ -354,7 +354,65 @@ create trigger kisa_osallistujat_estaisyys_muutos
   before update on public.kisa_osallistujat
   for each row execute procedure public.estaisyys_muutos_kisa_osallistujat();
 
--- 14) Row Level Security kisat-, kisa_osallistujat- ja kisa_saaliit-tauluille
+-- 14) Kisojen RLS-apufunktiot (SECURITY DEFINER). Nailla vaeltetaan
+-- "kisat" ja "kisa_osallistujat" -taulujen RLS-kaytantojen aareton
+-- rekursio (kumpikin taulu tarkistaisi toisensa RLS:n loputtomiin, jos
+-- tarkistus tehtaisiin suoraan taulujen valisella exists()-kyselylla
+-- policyn sisalla). search_path on lukittu tyhjaksi jottei funktiota voi
+-- kaapata luomalla public-skeemaan samannimisia haitallisia olioita, ja
+-- kaikki viittaukset ovat taysin skeemattu (public.kisat, auth.uid()).
+create or replace function public.onko_kisan_luoja(p_kisa_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (
+    select 1 from public.kisat
+    where id = p_kisa_id and luoja_id = auth.uid()
+  );
+$$;
+
+create or replace function public.onko_kisan_osallistuja(p_kisa_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (
+    select 1 from public.kisa_osallistujat
+    where kisa_id = p_kisa_id
+      and kayttaja_id = auth.uid()
+      and tila in ('pending', 'accepted')
+  );
+$$;
+
+create or replace function public.onko_hyvaksytty_kisaosallistuja(p_kisa_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (
+    select 1 from public.kisa_osallistujat
+    where kisa_id = p_kisa_id
+      and kayttaja_id = auth.uid()
+      and tila = 'accepted'
+  );
+$$;
+
+revoke all on function public.onko_kisan_luoja(uuid) from public;
+revoke all on function public.onko_kisan_osallistuja(uuid) from public;
+revoke all on function public.onko_hyvaksytty_kisaosallistuja(uuid) from public;
+grant execute on function public.onko_kisan_luoja(uuid) to authenticated;
+grant execute on function public.onko_kisan_osallistuja(uuid) to authenticated;
+grant execute on function public.onko_hyvaksytty_kisaosallistuja(uuid) to authenticated;
+
+-- 15) Row Level Security kisat-, kisa_osallistujat- ja kisa_saaliit-tauluille
+-- (kayttaa yllaolevia apufunktioita rekursion valttamiseksi)
 alter table public.kisat enable row level security;
 
 drop policy if exists "Osallistujat nakevat kisan" on public.kisat;
@@ -362,10 +420,7 @@ create policy "Osallistujat nakevat kisan"
   on public.kisat for select
   using (
     auth.uid() = luoja_id
-    or exists (
-      select 1 from public.kisa_osallistujat o
-      where o.kisa_id = kisat.id and o.kayttaja_id = auth.uid()
-    )
+    or public.onko_kisan_osallistuja(id)
   );
 
 drop policy if exists "Kayttaja luo kisan omissa nimissaan" on public.kisat;
@@ -391,10 +446,7 @@ create policy "Nakee oman rivin tai oman kisan osallistujat"
   on public.kisa_osallistujat for select
   using (
     auth.uid() = kayttaja_id
-    or exists (
-      select 1 from public.kisat k
-      where k.id = kisa_osallistujat.kisa_id and k.luoja_id = auth.uid()
-    )
+    or public.onko_kisan_luoja(kisa_id)
   );
 
 drop policy if exists "Luoja kutsuu hyvaksytyn kaverin" on public.kisa_osallistujat;
@@ -402,10 +454,7 @@ create policy "Luoja kutsuu hyvaksytyn kaverin"
   on public.kisa_osallistujat for insert
   with check (
     tila = 'pending'
-    and exists (
-      select 1 from public.kisat k
-      where k.id = kisa_osallistujat.kisa_id and k.luoja_id = auth.uid()
-    )
+    and public.onko_kisan_luoja(kisa_id)
     and exists (
       select 1 from public.kaverit c
       where c.tila = 'accepted'
@@ -443,10 +492,7 @@ create policy "Osallistuja liittaa oman saaliin ilmoitettavaan kisaan"
       select 1 from public.saaliit s
       where s.id = kisa_saaliit.saalis_id and s.user_id = auth.uid()
     )
-    and exists (
-      select 1 from public.kisa_osallistujat o
-      where o.kisa_id = kisa_saaliit.kisa_id and o.kayttaja_id = auth.uid() and o.tila = 'accepted'
-    )
+    and public.onko_hyvaksytty_kisaosallistuja(kisa_id)
     and exists (
       select 1 from public.kisat k
       where k.id = kisa_saaliit.kisa_id and k.laskentatapa = 'ilmoitettava'
@@ -458,7 +504,7 @@ create policy "Kayttaja irrottaa oman kisaliitoksensa"
   on public.kisa_saaliit for delete
   using (auth.uid() = kayttaja_id);
 
--- 15) Tulostaulukko: turvallinen funktio joka laskee tulokset kaikkien
+-- 16) Tulostaulukko: turvallinen funktio joka laskee tulokset kaikkien
 -- hyvaksyttyjen osallistujien saaliista ja palauttaa vain kayttajanimen,
 -- nayttonimen ja lasketun tuloksen - ei sijaintia, kuvia tai muita
 -- saaliin yksityiskohtia.
@@ -471,7 +517,7 @@ returns table (
 )
 language plpgsql
 security definer
-set search_path = public
+set search_path = ''
 as $$
 declare
   v_kisa record;
