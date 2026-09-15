@@ -438,15 +438,16 @@ button {
 
 .sijainti-rivi {
   display: flex;
+  flex-direction: column;
   gap: 0.5rem;
 }
 
 .sijainti-rivi input {
-  flex: 1;
+  width: 100%;
 }
 
 .sijainti-rivi button {
-  padding: 0 0.9rem;
+  padding: 0.62rem 0.9rem;
   border-radius: var(--sade-s);
   border: 1px solid var(--vari-reunaviiva);
   background: var(--vari-pinta-korotettu);
@@ -454,6 +455,7 @@ button {
   font-size: 0.85rem;
   font-weight: 600;
   white-space: nowrap;
+  width: 100%;
 }
 
 /* ---------- Reissu-palkki ---------- */
@@ -469,6 +471,11 @@ button {
   margin-bottom: var(--vali-m);
 }
 
+.reissu-palkki:not(.reissu-palkki-aktiivinen) {
+  flex-direction: column;
+  align-items: stretch;
+}
+
 .reissu-palkki input {
   flex: 1;
 }
@@ -482,6 +489,10 @@ button {
   font-weight: 650;
   font-size: 0.88rem;
   white-space: nowrap;
+}
+
+.reissu-palkki:not(.reissu-palkki-aktiivinen) button {
+  width: 100%;
 }
 
 .reissu-palkki-aktiivinen {
@@ -856,15 +867,16 @@ button {
 
 .friend-lisays-rivi {
   display: flex;
+  flex-direction: column;
   gap: 0.5rem;
 }
 
 .friend-lisays-rivi input {
-  flex: 1;
+  width: 100%;
 }
 
 .friend-lisays-rivi button {
-  padding: 0 1rem;
+  padding: 0.75rem 1rem;
   border: none;
   border-radius: var(--sade-s);
   background: var(--vari-korostus);
@@ -872,6 +884,7 @@ button {
   font-weight: 650;
   font-size: 0.88rem;
   white-space: nowrap;
+  width: 100%;
 }
 
 .friends-osio {
