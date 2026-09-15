@@ -25,9 +25,10 @@ helppo lisata myohemmin ilman etta olemassa olevaa koodia tarvitsee purkaa.
 2. Kopioi **koko** tiedoston sisalto.
 3. Liita se Supabasen SQL Editoriin ja paina **Run**.
 
-Tama luo kaiken kerralla: `saaliit`-, `reissut`-, `profiilit`-, `kaverit`-,
-`kisat`-, `kisa_osallistujat`- ja `kisa_saaliit`-taulut, RLS-kaytannot,
-tulostaulukkofunktion seka `saalis-kuvat`-storage-bucketin.
+Tama luo kaiken kerralla valmiiksi korjattuna ja koventettuna: `saaliit`-,
+`reissut`-, `profiilit`-, `kaverit`-, `kisat`-, `kisa_osallistujat`- ja
+`kisa_saaliit`-taulut, RLS-kaytannot, apufunktiot, tulostaulukkofunktion
+seka `saalis-kuvat`-storage-bucketin.
 
 ### Sinulla on jo aiempi asennus
 
@@ -40,10 +41,20 @@ Aja **vain puuttuvat** migraatiot jarjestyksessa kansiosta
    [`0003_kaverit.sql`](supabase/migrations/0003_kaverit.sql)
 3. Jos tauluja `kisat`/`kisa_osallistujat`/`kisa_saaliit` ei viela ole:
    [`0004_kisat.sql`](supabase/migrations/0004_kisat.sql)
+4. Jos kisan luonti antaa virheen "infinite recursion detected in policy
+   for relation kisat":
+   [`0005_kisat_rls_korjaus.sql`](supabase/migrations/0005_kisat_rls_korjaus.sql)
+5. Aja aina viimeiseksi (kovensi migraation 0005 apufunktiot):
+   [`0006_kovenna_security_definer.sql`](supabase/migrations/0006_kovenna_security_definer.sql)
 
 Avaa tiedosto, kopioi koko sisalto Supabasen SQL Editoriin ja paina **Run**.
 Jarjestys on tarkea: `0004_kisat.sql` vaatii etta `0003_kaverit.sql`
-(profiilit- ja kaverit-taulut) on jo ajettu.
+(profiilit- ja kaverit-taulut) on jo ajettu, `0005` vaatii etta `0004` on
+ajettu, ja `0006` vaatii etta `0005` on ajettu (se kovensi samat funktiot).
+
+Jos olet ajanut vasta `0004_kisat.sql`:n etka viela `0005`:tta, voit ajaa
+suoraan `0006_kovenna_security_definer.sql`:n heti `0005`:n jalkeen - se ei
+vaadi mitaan valissa.
 
 Kaikki skriptit on turvallista ajaa uudelleen tarvittaessa.
 
@@ -115,10 +126,10 @@ src/
   App.css / index.css       Tyylit (mobiili edella)
   lib/
     supabaseClient.js        Supabase-yhteyden alustus ymparistomuuttujista
-  auth/                      Kirjautuminen (ei muutettu tassa PR:ssa)
-  catches/                   Saaliin lisays ja historia (ei muutettu tassa PR:ssa)
-  trips/                     Kalareissut (ei muutettu tassa PR:ssa)
-  friends/                   Profiilit ja kaverisuhteet (ei muutettu tassa PR:ssa)
+  auth/                      Kirjautuminen
+  catches/                   Saaliin lisays ja historia
+  trips/                     Kalareissut
+  friends/                   Profiilit ja kaverisuhteet
   competitions/
     constants.js              Mittarien ja laskentatapojen vakiot
     dateUtils.js              Paivamaaramuotoilu ja kisan tilan paattely
@@ -129,13 +140,15 @@ src/
     CompetitionList.jsx       Omat kisat ryhmiteltyna (kaynnissa/tulevat/paattyneet)
     CompetitionDetail.jsx     Kisan tiedot, tulostaulukko ja saaliiden liittaminen
     CompetitionsView.jsx      Kisat-valilehden kokoava nakyma
-  stats/                     Perustilastot (ei muutettu tassa PR:ssa)
+  stats/                     Perustilastot
 supabase/
   schema.sql                 Koko tietokantarakenne (taulut, RLS-kaytannot, funktiot, storage-bucket)
   migrations/
     0002_reissut.sql
     0003_kaverit.sql
-    0004_kisat.sql             Kisat, osallistujat, ilmoitettavat saaliit, tulostaulukko-RPC
+    0004_kisat.sql                    Kisat, osallistujat, ilmoitettavat saaliit, tulostaulukko-RPC
+    0005_kisat_rls_korjaus.sql        Korjaa kisojen RLS-kaytantojen aareton rekursio
+    0006_kovenna_security_definer.sql Lukitsee SECURITY DEFINER -funktioiden search_path-asetukset
 ```
 
 ## Huomioita kisat-ominaisuudesta
@@ -147,6 +160,12 @@ supabase/
   puolella turvallisella funktiolla, joka palauttaa vain kayttajanimen,
   nayttonimen ja lasketun tuloksen - ei koskaan sijaintia, kuvia tai
   muita saaliin yksityiskohtia.
+- Kisojen ja niiden osallistujien nakyvyys tarkistetaan kolmen pienen
+  apufunktion kautta (`onko_kisan_luoja`, `onko_kisan_osallistuja`,
+  `onko_hyvaksytty_kisaosallistuja`), jotka valttavat RLS-kaytantojen
+  aarettoman rekursion. Funktiot palauttavat vain tosi/epatosi, eivat
+  koskaan rividataa, niiden search_path on lukittu tyhjaksi (ei voi
+  kaapata) ja niita saa suorittaa vain kirjautunut kayttaja.
 - Koska `catches`-, `trips`-, `friends`-, `stats`- ja `auth`-moduuleja ei
   saanut muuttaa, saaliin liittaminen "ilmoitettavaan" kisaan tehdaan
   kisan omalta sivulta ("Liita omia saaliita kisaan") eika Historia-
