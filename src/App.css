@@ -356,14 +356,12 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: var(--vari-tausta);
   border: 1px solid var(--vari-reunaviiva);
   color: var(--vari-teksti-himmea);
-  font-size: 0.78rem;
-  font-weight: 700;
 }
 
 .laji-teksti {
@@ -378,9 +376,9 @@ button {
 }
 
 .laji-nappi.valittu .laji-merkki {
-  background: var(--vari-paa);
+  background: var(--vari-paa-hento);
   border-color: var(--vari-paa);
-  color: #eef7f6;
+  color: var(--vari-paa-tumma);
 }
 
 .kuva-valinta {
