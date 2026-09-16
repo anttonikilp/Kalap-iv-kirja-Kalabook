@@ -53,6 +53,8 @@ Aja **vain puuttuvat** migraatiot jarjestyksessa kansiosta
 6. Jos taulua `ilmoitukset` ei viela ole (sovelluksen sisaiset
    ilmoitukset, kellokuvake ylapalkissa):
    [`0007_ilmoitukset.sql`](supabase/migrations/0007_ilmoitukset.sql)
+7. Jos joukkuekisoja (kisatyyppina "Joukkuekisa") ei viela ole:
+   [`0008_joukkuekisat.sql`](supabase/migrations/0008_joukkuekisat.sql)
 
 Avaa tiedosto, kopioi koko sisalto Supabasen SQL Editoriin ja paina **Run**.
 Jarjestys on tarkea: `0004_kisat.sql` vaatii etta `0003_kaverit.sql`
@@ -60,7 +62,8 @@ Jarjestys on tarkea: `0004_kisat.sql` vaatii etta `0003_kaverit.sql`
 ajettu, `0006` vaatii etta `0005` on ajettu (se kovensi samat funktiot), ja
 `0007_ilmoitukset.sql` vaatii etta `0002`-`0006` on jo ajettu (se kayttaa
 tauluja `profiilit`, `kaverit`, `kisat`, `kisa_osallistujat`, `kisa_saaliit`
-ja `saaliit`).
+ja `saaliit`). `0008_joukkuekisat.sql` vaatii etta `0002`-`0007` on jo
+ajettu (se lisaa uuden kisatyypin olemassa olevaan `kisat`-tauluun).
 
 Jos olet ajanut vasta `0004_kisat.sql`:n etka viela `0005`:tta, voit ajaa
 suoraan `0006_kovenna_security_definer.sql`:n heti `0005`:n jalkeen - se ei
@@ -166,8 +169,10 @@ src/
     CompetitionInvites.jsx    Saapuneet kisakutsut (hyvaksy/hylkaa)
     InviteFriendPanel.jsx     Hyvaksyttyjen kavereiden kutsuminen kisaan
     CompetitionList.jsx       Omat kisat ryhmiteltyna (kaynnissa/tulevat/paattyneet)
-    CompetitionDetail.jsx     Kisan tiedot, tulostaulukko ja saaliiden liittaminen
+    CompetitionDetail.jsx     Kisan tiedot, tulostaulukko ja saaliiden liittaminen (yksilo- ja joukkuekisat)
     CompetitionsView.jsx      Kisat-valilehden kokoava nakyma
+    TeamsPanel.jsx            Joukkuekisan luojan tyokalut: joukkueiden luonti ja kaverien kutsuminen niihin
+    TeamScoreboard.jsx        Joukkuekisan tulostaulukko (joukkueet ja niiden jasenten osuudet)
   stats/                     Perustilastot (nayttyy Profiili-valilehdella)
   notifications/
     notificationService.js    Supabase-kyselyt: ilmoitusten haku, lukemattomien maara, luetuksi merkitseminen
@@ -184,6 +189,7 @@ supabase/
     0005_kisat_rls_korjaus.sql        Korjaa kisojen RLS-kaytantojen aareton rekursio
     0006_kovenna_security_definer.sql Lukitsee SECURITY DEFINER -funktioiden search_path-asetukset
     0007_ilmoitukset.sql              Sovelluksen sisaiset ilmoitukset: taulu, RLS ja luontitriggerit
+    0008_joukkuekisat.sql             Joukkuekisat: kisatyyppi, joukkueet, joukkuetulostaulukko-RPC
 ```
 
 ## Huomioita navigaatiouudistuksesta
@@ -229,6 +235,47 @@ supabase/
   kausi-, joukkue- eika premium-kisoja. Kisan muokkaus- ja
   poistotoiminnot on valmiina tietoturvassa (RLS), mutta niille ei ole
   viela kayttoliittymaa - ne on helppo lisata myohemmin.
+
+## Huomioita joukkuekisat-ominaisuudesta
+
+- Kisan luoja valitsee kisatyypin ("Yksilokisa" tai "Joukkuekisa") jo kisaa
+  luodessa. Yksilokisat toimivat tismalleen kuten ennen - `tyyppi`-sarake
+  oletusarvoistuu vanhoille ja uusille yksilokisoille arvoon `yksilo`.
+- Joukkuekisassa joukkueen koko on vapaa (2 tai enemman), joten sama
+  kisatyyppi kattaa myos parikisat. Luoja valitsee lisaksi joukkueiden
+  laskentatavan: **"Joukkueen yhteistulos"** (jasenten saaliit lasketaan
+  yhteen - yhteispaino tai kalojen kokonaismaara sen mukaan, kumpi mittari
+  kisaan valittiin) tai **"Joukkueen suurin kala"** (ratkaisee joukkueen
+  paras yksittainen kala). Huomaa etta yhdistelma mittari "Eniten kaloja" +
+  laskentatapa "Joukkueen suurin kala" on matemaattisesti erikoistapaus
+  (nayttaa 1:n heti kun joukkueella on yksikin saalis) - molemmat valinnat
+  ovat silti riippumattomia toisistaan speksin mukaisesti.
+- Vain kisan luoja voi luoda joukkueita ja kutsua niihin hyvaksyttyja
+  kavereitaan (`TeamsPanel.jsx`). Koska kisan luoja lisataan automaattisesti
+  osallistujaksi jo kisaa luotaessa (ennen kuin yhtaan joukkuetta on
+  olemassa), luoja liittaa itsensa haluamaansa joukkueeseen jalkikateen
+  "Liity itse" -napilla samalla sivulla.
+- Kutsuttu nakee mihin joukkueeseen ja kisaan hanet on kutsuttu, ja
+  hyvaksyy/hylkaa kutsun tismalleen samalla tavalla kuin yksilokisoissa.
+  Kukin osallistuja kuuluu kisassa korkeintaan yhteen joukkueeseen.
+- **Tietoturva**: uusi `estaisyys_joukkue_paivitys`-trigger varmistaa etta
+  vain kisan luoja voi muuttaa jonkun toisen joukkuejakoa, ja vain
+  osallistuja itse voi muuttaa oman kutsunsa tilan (hyvaksy/hylkaa) - kisan
+  luoja ei siis voi joukkuejakoa tehdessaan vahingossa hyvaksya kutsua
+  toisen puolesta. Uusi `kisan_joukkuetulokset`-funktio on SECURITY DEFINER
+  ja sen `search_path` on lukittu tyhjaksi migraation 0006 tapaan; se
+  tarkistaa aina ensin etta kutsuja on itse hyvaksytty osallistuja kisassa,
+  ja palauttaa - kuten yksilokisojenkin tulostaulukko - vain kayttajanimen,
+  nayttonimen ja lasketut tulokset. Ei koskaan tarkkaa sijaintia, kuvia tai
+  muita saaliin yksityiskohtia missaan vaiheessa.
+- Osallistuja, joka on hyvaksytty kisaan mutta jota ei ole viela liitetty
+  mihinkaan joukkueeseen, nakyy osallistujalistalla mutta ei
+  joukkuetulostaulukossa (kelpaa mukaan vasta kun luoja on jakanut hanet
+  joukkueeseen).
+- Kaikki `0008_joukkuekisat.sql`:n SQL-muutokset testattiin paikallista
+  Postgresia vasten synteettisella usean joukkueen testidatalla ennen
+  julkaisua (molemmat laskentatavat, molemmat mittarit, joukkueeton
+  osallistuja ja ei-osallistujan yritys hakea tuloksia).
 
 ## Huomioita ilmoitukset-ominaisuudesta
 

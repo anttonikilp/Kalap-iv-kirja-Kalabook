@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient.js'
 const KISAT = 'kisat'
 const OSALLISTUJAT = 'kisa_osallistujat'
 const KISA_SAALIIT = 'kisa_saaliit'
+const JOUKKUEET = 'kisa_joukkueet'
 
 async function nykyinenKayttaja() {
   const {
@@ -30,7 +31,7 @@ export async function haeOmatKisat() {
   const { data, error } = await supabase
     .from(OSALLISTUJAT)
     .select(
-      `kisa:${KISAT}(id, nimi, laji, mittari, laskentatapa, alkupaiva, loppupaiva, luoja_id)`
+      `kisa:${KISAT}(id, nimi, laji, mittari, laskentatapa, alkupaiva, loppupaiva, luoja_id, tyyppi, joukkuelaskentatapa)`
     )
     .eq('kayttaja_id', user.id)
     .eq('tila', 'accepted')
@@ -45,7 +46,8 @@ export async function haeSaapuneetKutsut() {
   const { data, error } = await supabase
     .from(OSALLISTUJAT)
     .select(
-      `id, created_at, kisa:${KISAT}(id, nimi, laji, mittari, laskentatapa, alkupaiva, loppupaiva, luoja:profiilit(kayttajanimi, nayttonimi))`
+      `id, created_at, joukkue:${JOUKKUEET}(id, nimi), ` +
+        `kisa:${KISAT}(id, nimi, laji, mittari, laskentatapa, alkupaiva, loppupaiva, tyyppi, joukkuelaskentatapa, luoja:profiilit(kayttajanimi, nayttonimi))`
     )
     .eq('kayttaja_id', user.id)
     .eq('tila', 'pending')
@@ -77,6 +79,8 @@ export async function luoKisa(tiedot) {
       laskentatapa: tiedot.laskentatapa,
       alkupaiva: tiedot.alkupaiva,
       loppupaiva: tiedot.loppupaiva,
+      tyyppi: tiedot.tyyppi || 'yksilo',
+      joukkuelaskentatapa: tiedot.tyyppi === 'joukkue' ? tiedot.joukkuelaskentatapa : null,
     })
     .select()
     .single()
@@ -88,7 +92,9 @@ export async function luoKisa(tiedot) {
 export async function haeKisanOsallistujat(kisaId) {
   const { data, error } = await supabase
     .from(OSALLISTUJAT)
-    .select('id, kayttaja_id, tila, profiili:profiilit(kayttajanimi, nayttonimi)')
+    .select(
+      `id, kayttaja_id, tila, joukkue_id, profiili:profiilit(kayttajanimi, nayttonimi), joukkue:${JOUKKUEET}(id, nimi)`
+    )
     .eq('kisa_id', kisaId)
     .order('created_at', { ascending: true })
 
@@ -96,10 +102,13 @@ export async function haeKisanOsallistujat(kisaId) {
   return data
 }
 
-export async function kutsuKaveri(kisaId, kaverinProfiiliId) {
-  const { error } = await supabase
-    .from(OSALLISTUJAT)
-    .insert({ kisa_id: kisaId, kayttaja_id: kaverinProfiiliId, tila: 'pending' })
+export async function kutsuKaveri(kisaId, kaverinProfiiliId, joukkueId) {
+  const { error } = await supabase.from(OSALLISTUJAT).insert({
+    kisa_id: kisaId,
+    kayttaja_id: kaverinProfiiliId,
+    tila: 'pending',
+    joukkue_id: joukkueId || null,
+  })
 
   if (error) {
     if (error.code === '23505') {
@@ -111,6 +120,49 @@ export async function kutsuKaveri(kisaId, kaverinProfiiliId) {
 
 export async function haeTulostaulukko(kisaId) {
   const { data, error } = await supabase.rpc('kisan_tulostaulukko', { p_kisa_id: kisaId })
+  if (error) throw error
+  return data
+}
+
+export async function haeKisanJoukkueet(kisaId) {
+  const { data, error } = await supabase
+    .from(JOUKKUEET)
+    .select('id, nimi')
+    .eq('kisa_id', kisaId)
+    .order('created_at', { ascending: true })
+
+  if (error) throw error
+  return data
+}
+
+export async function luoJoukkue(kisaId, nimi) {
+  const { data, error } = await supabase
+    .from(JOUKKUEET)
+    .insert({ kisa_id: kisaId, nimi })
+    .select()
+    .single()
+
+  if (error) {
+    if (error.code === '23505') {
+      throw new Error('Kisassa on jo tämänniminen joukkue.')
+    }
+    throw error
+  }
+
+  return data
+}
+
+export async function asetaJoukkue(osallistujaId, joukkueId) {
+  const { error } = await supabase
+    .from(OSALLISTUJAT)
+    .update({ joukkue_id: joukkueId || null })
+    .eq('id', osallistujaId)
+
+  if (error) throw error
+}
+
+export async function haeJoukkuetulokset(kisaId) {
+  const { data, error } = await supabase.rpc('kisan_joukkuetulokset', { p_kisa_id: kisaId })
   if (error) throw error
   return data
 }
