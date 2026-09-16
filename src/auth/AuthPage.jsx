@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from './AuthContext.jsx'
-import { FishIcon } from '../components/icons.jsx'
+import LogoFull from '../components/LogoFull.jsx'
 
 export default function AuthPage() {
   const { signIn, signUp } = useAuth()
@@ -32,10 +32,7 @@ export default function AuthPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <div className="auth-tunnus">
-          <FishIcon size={22} />
-        </div>
-        <h1>Kalapäiväkirja</h1>
+        <LogoFull height={48} />
         <p className="auth-subtitle">
           {tila === 'kirjaudu' ? 'Kirjaudu sisään' : 'Luo uusi tili'}
         </p>

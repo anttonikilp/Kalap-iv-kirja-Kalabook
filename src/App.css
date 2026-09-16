@@ -19,8 +19,10 @@
   z-index: 10;
 }
 
-.app-header h1 {
-  margin: 0;
+.app-logo-merkki {
+  height: 34px;
+  width: auto;
+  display: block;
 }
 
 .app-header-oikea {
