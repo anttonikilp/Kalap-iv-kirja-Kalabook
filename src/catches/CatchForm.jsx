@@ -1,8 +1,13 @@
 import { useRef, useState } from 'react'
 import { LAJIT, KALASTUSTAVAT } from './species.js'
 import { lisaaSaalis } from './catchService.js'
+import { haePaikannimi } from './geocode.js'
 import { useTrips } from '../trips/TripsContext.jsx'
 import { CameraIcon, MapPinIcon } from '../components/icons.jsx'
+
+function muotoileKoordinaatit(lat, lon) {
+  return `${lat.toFixed(5)}, ${lon.toFixed(5)}`
+}
 
 function nytPaikallisena() {
   const nyt = new Date()
@@ -55,11 +60,19 @@ export default function CatchForm({ onTallennettu }) {
     setHaetaanSijaintia(true)
 
     navigator.geolocation.getCurrentPosition(
-      (asema) => {
-        const lat = asema.coords.latitude.toFixed(5)
-        const lon = asema.coords.longitude.toFixed(5)
-        paivita('sijainti_teksti', `${lat}, ${lon}`)
-        setHaetaanSijaintia(false)
+      async (asema) => {
+        const lat = asema.coords.latitude
+        const lon = asema.coords.longitude
+
+        try {
+          const nimi = await haePaikannimi(lat, lon)
+          paivita('sijainti_teksti', nimi || muotoileKoordinaatit(lat, lon))
+        } catch {
+          paivita('sijainti_teksti', muotoileKoordinaatit(lat, lon))
+          setVirhe('Paikannimeä ei saatu - tallennettiin koordinaatit sen sijaan.')
+        } finally {
+          setHaetaanSijaintia(false)
+        }
       },
       () => {
         setVirhe('Sijaintia ei saatu. Voit kirjoittaa sen käsin.')
