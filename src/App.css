@@ -1148,8 +1148,11 @@ button {
   text-align: center;
 }
 
-.auth-card h1 {
-  margin: 0 0 0.3rem;
+.auth-logo-taysi {
+  display: block;
+  height: 90px;
+  width: auto;
+  margin: 0 auto 0.3rem;
 }
 
 .auth-subtitle {
