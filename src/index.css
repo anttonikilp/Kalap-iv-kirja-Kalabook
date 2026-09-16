@@ -1,29 +1,29 @@
 :root {
-  /* Tausta ja pinnat */
-  --vari-tausta: #10161a;
-  --vari-pinta: #1a2226;
-  --vari-pinta-korotettu: #212b30;
+  /* Tausta ja pinnat - raikas vaalea */
+  --vari-tausta: #f3f7f7;
+  --vari-pinta: #ffffff;
+  --vari-pinta-korotettu: #eaf2f1;
 
-  /* Paavari (hillitty sinivihrea) - kayttajaliittyman rungon vari */
-  --vari-paa: #5b9490;
-  --vari-paa-vaalea: #94c7c2;
-  --vari-paa-tumma: #2c4b48;
-  --vari-paa-hento: rgba(91, 148, 144, 0.16);
+  /* Paavari (sinivihrea/turkoosi) - kayttajaliittyman rungon vari */
+  --vari-paa: #2f8f86;
+  --vari-paa-vaalea: #146b62;
+  --vari-paa-tumma: #0f4a44;
+  --vari-paa-hento: #e0f1ee;
 
   /* Korostusvari - vain tarkeimpaan toimintoon (paatoiminnon nappi) */
-  --vari-korostus: #d97757;
-  --vari-korostus-tumma: #b8613f;
-  --vari-korostus-hento: rgba(217, 119, 87, 0.18);
+  --vari-korostus: #b3551f;
+  --vari-korostus-tumma: #8f4419;
+  --vari-korostus-hento: #fce8d9;
 
   /* Neutraalit tekstivarit */
-  --vari-teksti: #eef1f2;
-  --vari-teksti-hento: #a3aeb2;
-  --vari-teksti-himmea: #6f7a7e;
+  --vari-teksti: #16232a;
+  --vari-teksti-hento: #52646b;
+  --vari-teksti-himmea: #7c8b91;
 
   /* Rajaviivat ja tilaviestit */
-  --vari-reunaviiva: #2a3438;
-  --vari-virhe: #e5787a;
-  --vari-onnistui: #7fc3a0;
+  --vari-reunaviiva: #dee7e6;
+  --vari-virhe: #c0392b;
+  --vari-onnistui: #1c7850;
 
   /* Yhtenaiset mitat */
   --sade-s: 10px;
@@ -32,9 +32,9 @@
   --vali-s: 0.5rem;
   --vali-m: 1rem;
   --vali-l: 1.5rem;
-  --varjo-kortti: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --varjo-kortti: 0 1px 3px rgba(20, 35, 42, 0.1);
 
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 * {
@@ -58,7 +58,7 @@ body {
 h1,
 h2,
 h3 {
-  font-family: inherit;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--vari-teksti);
 }
 
@@ -106,7 +106,7 @@ button {
 input,
 select,
 textarea {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 #root {

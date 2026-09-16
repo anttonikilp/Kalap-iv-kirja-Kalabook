@@ -1,0 +1,19 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="vaappuGradientti" gradientUnits="userSpaceOnUse" x1="47" y1="38" x2="85" y2="38">
+      <stop offset="0%" stop-color="#2c4b48"/>
+      <stop offset="100%" stop-color="#a9e0da"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(3.8,2.3) rotate(-20 50 50)">
+    <!-- Kala (fish) - taka-alalla, seuraa vaappua -->
+    <path d="M22 54 L9 45 L13 54 L9 63 Z" fill="#3d7a8c"/>
+    <ellipse cx="35" cy="54" rx="14" ry="9" fill="#3d7a8c"/>
+    <circle cx="41" cy="51" r="2.2" fill="#eef1f2"/>
+
+    <!-- Vaappu (lure) - edella, houkuttelee -->
+    <circle cx="44" cy="38" r="4" fill="none" stroke="#2c4b48" stroke-width="2.2"/>
+    <ellipse cx="66" cy="38" rx="19" ry="8" fill="url(#vaappuGradientti)"/>
+    <path d="M55 34 Q66 30 77 34" stroke="#f4fbfa" stroke-width="1.6" fill="none" opacity="0.6" stroke-linecap="round"/>
+  </g>
+</svg>
