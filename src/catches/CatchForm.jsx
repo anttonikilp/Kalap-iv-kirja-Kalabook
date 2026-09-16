@@ -4,6 +4,7 @@ import { lisaaSaalis } from './catchService.js'
 import { haePaikannimi } from './geocode.js'
 import { useTrips } from '../trips/TripsContext.jsx'
 import { CameraIcon, MapPinIcon } from '../components/icons.jsx'
+import { LajiIkoni } from './speciesIcons.jsx'
 
 function muotoileKoordinaatit(lat, lon) {
   return `${lat.toFixed(5)}, ${lon.toFixed(5)}`
@@ -135,7 +136,7 @@ export default function CatchForm({ onTallennettu }) {
             onClick={() => paivita('laji', laji.id)}
           >
             <span className="laji-merkki" aria-hidden="true">
-              {laji.nimi.charAt(0)}
+              <LajiIkoni laji={laji.id} size={22} />
             </span>
             <span className="laji-teksti">{laji.nimi}</span>
           </button>
