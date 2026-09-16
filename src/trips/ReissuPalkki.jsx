@@ -8,7 +8,9 @@ export default function ReissuPalkki() {
   const [kasitellaan, setKasitellaan] = useState(false)
   const [virhe, setVirhe] = useState('')
 
-  if (lataaAktiivinen) return null
+  if (lataaAktiivinen) {
+    return <p className="tila-teksti-pieni reissu-lataus">Tarkistetaan reissutilannetta...</p>
+  }
 
   async function kasitteleAloitus(e) {
     e.preventDefault()
