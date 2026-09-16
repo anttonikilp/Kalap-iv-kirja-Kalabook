@@ -50,6 +50,7 @@ function InviteItem({ kutsu, onMuutos }) {
           {muotoilePaiva(kisa.alkupaiva)}–{muotoilePaiva(kisa.loppupaiva)}
         </span>
         <span>{mittarinNimi(kisa.mittari)}</span>
+        {kutsu.joukkue && <span>Joukkue: {kutsu.joukkue.nimi}</span>}
       </div>
       <div className="friend-item-toiminnot">
         <button

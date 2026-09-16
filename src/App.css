@@ -1140,6 +1140,87 @@ button {
   color: var(--vari-teksti);
 }
 
+/* ---------- Joukkuekisat ---------- */
+
+.kisa-tulostaulukko li.kisa-joukkue-li {
+  display: block;
+  padding: 0;
+}
+
+.kisa-joukkue-rivi {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.9rem;
+}
+
+.kisa-joukkue-jasenet {
+  list-style: none;
+  margin: 0;
+  padding: 0 0.9rem 0.65rem 2.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.kisa-joukkue-jasenet li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--vari-teksti-hento);
+}
+
+.kisa-joukkue-jasenet li.kisa-oma-jasen {
+  color: var(--vari-teksti);
+  font-weight: 650;
+}
+
+.joukkueet-hallinta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vali-m);
+}
+
+.joukkueet-kutsu-otsikko {
+  margin: var(--vali-s) 0 0;
+}
+
+.joukkue-oma-merkki {
+  flex-shrink: 0;
+  font-size: 0.76rem;
+  font-weight: 650;
+  color: var(--vari-paa-vaalea);
+  white-space: nowrap;
+}
+
+.joukkue-kutsu-lomake {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.joukkue-kutsu-lomake select {
+  width: 100%;
+  padding: 0.62rem 0.75rem;
+  border: 1px solid var(--vari-reunaviiva);
+  border-radius: var(--sade-s);
+  font-size: 0.95rem;
+  color: var(--vari-teksti);
+  background: var(--vari-pinta-korotettu);
+}
+
+.joukkue-kutsu-lomake button {
+  width: 100%;
+  padding: 0.7rem;
+  border: none;
+  border-radius: var(--sade-s);
+  background: var(--vari-korostus);
+  color: #fff8f4;
+  font-weight: 650;
+  font-size: 0.88rem;
+}
+
 /* ---------- Kirjautuminen ---------- */
 
 .auth-page {

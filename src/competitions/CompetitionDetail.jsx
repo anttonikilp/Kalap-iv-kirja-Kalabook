@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react'
 import * as competitionService from './competitionService.js'
 import { muotoilePaiva, kisanTila } from './dateUtils.js'
-import { mittarinNimi, laskentatavanNimi } from './constants.js'
+import { mittarinNimi, laskentatavanNimi, joukkuelaskentatavanNimi } from './constants.js'
 import { lajinNimi } from '../catches/species.js'
 import InviteFriendPanel from './InviteFriendPanel.jsx'
+import TeamsPanel from './TeamsPanel.jsx'
+import TeamScoreboard from './TeamScoreboard.jsx'
 import { ArrowLeftIcon, MedalIcon, TrophyIcon, CalendarIcon, FishIcon } from '../components/icons.jsx'
 
 export default function CompetitionDetail({ kisa, omaId, onTakaisin }) {
   const [osallistujat, setOsallistujat] = useState([])
   const [tulokset, setTulokset] = useState([])
+  const [joukkueet, setJoukkueet] = useState([])
+  const [joukkuetulokset, setJoukkuetulokset] = useState([])
   const [lataa, setLataa] = useState(true)
   const [virhe, setVirhe] = useState('')
   const [paivitysAvain, setPaivitysAvain] = useState(0)
@@ -17,6 +21,7 @@ export default function CompetitionDetail({ kisa, omaId, onTakaisin }) {
   const [linkitetyt, setLinkitetyt] = useState(new Set())
 
   const onLuoja = kisa.luoja_id === omaId
+  const onJoukkuekisa = kisa.tyyppi === 'joukkue'
   const tila = kisanTila(kisa)
 
   function paivita() {
@@ -28,12 +33,28 @@ export default function CompetitionDetail({ kisa, omaId, onTakaisin }) {
     setLataa(true)
     setVirhe('')
 
-    Promise.all([
-      competitionService.haeKisanOsallistujat(kisa.id),
-      competitionService.haeTulostaulukko(kisa.id),
-    ])
-      .then(([osallistujaData, tulosData]) => {
-        if (!peruttu) {
+    const haut = onJoukkuekisa
+      ? Promise.all([
+          competitionService.haeKisanOsallistujat(kisa.id),
+          competitionService.haeKisanJoukkueet(kisa.id),
+          competitionService.haeJoukkuetulokset(kisa.id),
+        ])
+      : Promise.all([
+          competitionService.haeKisanOsallistujat(kisa.id),
+          competitionService.haeTulostaulukko(kisa.id),
+        ])
+
+    haut
+      .then((tulos) => {
+        if (peruttu) return
+
+        if (onJoukkuekisa) {
+          const [osallistujaData, joukkueData, joukkuetulosData] = tulos
+          setOsallistujat(osallistujaData)
+          setJoukkueet(joukkueData)
+          setJoukkuetulokset(joukkuetulosData)
+        } else {
+          const [osallistujaData, tulosData] = tulos
           setOsallistujat(osallistujaData)
           setTulokset(tulosData)
         }
@@ -48,7 +69,7 @@ export default function CompetitionDetail({ kisa, omaId, onTakaisin }) {
     return () => {
       peruttu = true
     }
-  }, [kisa.id, paivitysAvain])
+  }, [kisa.id, onJoukkuekisa, paivitysAvain])
 
   useEffect(() => {
     if (kisa.laskentatapa !== 'ilmoitettava' || tila === 'tuleva') return
@@ -98,6 +119,7 @@ export default function CompetitionDetail({ kisa, omaId, onTakaisin }) {
       <p className="tila-teksti kisa-tiedot-rivi">
         {kisa.laji ? lajinNimi(kisa.laji) : 'Kaikki lajit'} · {mittarinNimi(kisa.mittari)} ·{' '}
         {laskentatavanNimi(kisa.laskentatapa)}
+        {onJoukkuekisa && <> · {joukkuelaskentatavanNimi(kisa.joukkuelaskentatapa)}</>}
       </p>
       <p className="tila-teksti kisa-tiedot-rivi">
         <CalendarIcon size={13} />
@@ -115,7 +137,9 @@ export default function CompetitionDetail({ kisa, omaId, onTakaisin }) {
               <TrophyIcon size={14} />
               Tulostaulukko
             </h3>
-            {tulokset.length === 0 ? (
+            {onJoukkuekisa ? (
+              <TeamScoreboard tulokset={joukkuetulokset} mittari={kisa.mittari} omaId={omaId} />
+            ) : tulokset.length === 0 ? (
               <p className="tila-teksti-pieni">Ei vielä osallistujia.</p>
             ) : (
               <ol className="kisa-tulostaulukko">
@@ -184,20 +208,41 @@ export default function CompetitionDetail({ kisa, omaId, onTakaisin }) {
                 <li key={o.id} className="friend-item">
                   <div className="friend-item-tiedot">
                     <strong>{o.profiili?.nayttonimi || o.profiili?.kayttajanimi || 'Tuntematon'}</strong>
-                    <span>{osallistujanTilanNimi(o.tila)}</span>
+                    <span>
+                      {osallistujanTilanNimi(o.tila)}
+                      {onJoukkuekisa &&
+                        o.tila === 'accepted' &&
+                        ` · ${o.joukkue?.nimi || 'Ei vielä joukkuetta'}`}
+                    </span>
                   </div>
                 </li>
               ))}
             </ul>
           </section>
 
-          {onLuoja && (
+          {onLuoja && !onJoukkuekisa && (
             <section className="friends-osio">
               <h3>
                 <TrophyIcon size={14} />
                 Kutsu kaveri mukaan
               </h3>
               <InviteFriendPanel kisaId={kisa.id} osallistujat={osallistujat} onKutsuttu={paivita} />
+            </section>
+          )}
+
+          {onLuoja && onJoukkuekisa && (
+            <section className="friends-osio">
+              <h3>
+                <TrophyIcon size={14} />
+                Joukkueet
+              </h3>
+              <TeamsPanel
+                kisaId={kisa.id}
+                osallistujat={osallistujat}
+                joukkueet={joukkueet}
+                omaId={omaId}
+                onMuutos={paivita}
+              />
             </section>
           )}
         </>

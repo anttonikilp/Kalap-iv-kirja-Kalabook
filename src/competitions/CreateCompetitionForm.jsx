@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { LAJIT } from '../catches/species.js'
-import { MITTARIT, LASKENTATAVAT } from './constants.js'
+import { MITTARIT, LASKENTATAVAT, KISATYYPIT, JOUKKUELASKENTATAVAT } from './constants.js'
 import { tanaan } from './dateUtils.js'
 import { luoKisa } from './competitionService.js'
 import { TrophyIcon, XIcon, PlusIcon } from '../components/icons.jsx'
@@ -10,6 +10,8 @@ export default function CreateCompetitionForm({ onLuotu, onPeruuta }) {
   const [laji, setLaji] = useState('')
   const [mittari, setMittari] = useState(MITTARIT[0].id)
   const [laskentatapa, setLaskentatapa] = useState(LASKENTATAVAT[0].id)
+  const [tyyppi, setTyyppi] = useState(KISATYYPIT[0].id)
+  const [joukkuelaskentatapa, setJoukkuelaskentatapa] = useState(JOUKKUELASKENTATAVAT[0].id)
   const [alkupaiva, setAlkupaiva] = useState(tanaan())
   const [loppupaiva, setLoppupaiva] = useState(tanaan())
   const [virhe, setVirhe] = useState('')
@@ -27,7 +29,16 @@ export default function CreateCompetitionForm({ onLuotu, onPeruuta }) {
     setTallennetaan(true)
 
     try {
-      const kisa = await luoKisa({ nimi, laji, mittari, laskentatapa, alkupaiva, loppupaiva })
+      const kisa = await luoKisa({
+        nimi,
+        laji,
+        mittari,
+        laskentatapa,
+        alkupaiva,
+        loppupaiva,
+        tyyppi,
+        joukkuelaskentatapa,
+      })
       onLuotu(kisa)
     } catch (err) {
       setVirhe('Kisan luonti epäonnistui: ' + err.message)
@@ -65,6 +76,37 @@ export default function CreateCompetitionForm({ onLuotu, onPeruuta }) {
           ))}
         </select>
       </label>
+
+      <label>
+        Kisatyyppi
+        <select value={tyyppi} onChange={(e) => setTyyppi(e.target.value)}>
+          {KISATYYPIT.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.nimi}
+            </option>
+          ))}
+        </select>
+      </label>
+      <p className="tila-teksti-pieni kisa-ohje">
+        Joukkuekisassa joukkueiden koko on vapaa (2 tai enemmän) - sama tyyppi sopii siis myös
+        parikisaan.
+      </p>
+
+      {tyyppi === 'joukkue' && (
+        <label>
+          Joukkueiden laskentatapa
+          <select
+            value={joukkuelaskentatapa}
+            onChange={(e) => setJoukkuelaskentatapa(e.target.value)}
+          >
+            {JOUKKUELASKENTATAVAT.map((l) => (
+              <option key={l.id} value={l.id}>
+                {l.nimi}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
 
       <label>
         Mittari
