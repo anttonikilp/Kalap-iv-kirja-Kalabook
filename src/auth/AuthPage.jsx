@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useAuth } from './AuthContext.jsx'
-import LogoFull from '../components/LogoFull.jsx'
 
 export default function AuthPage() {
   const { signIn, signUp } = useAuth()
@@ -32,7 +31,7 @@ export default function AuthPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <LogoFull height={48} />
+        <img src="/logo/logo-taysi.png" alt="Fisko" className="auth-logo-taysi" />
         <p className="auth-subtitle">
           {tila === 'kirjaudu' ? 'Kirjaudu sisään' : 'Luo uusi tili'}
         </p>

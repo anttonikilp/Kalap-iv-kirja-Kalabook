@@ -38,7 +38,7 @@ function PaaNakyma({ signOut }) {
   return (
     <div className="app">
       <header className="app-header">
-        <img src="/logo/merkki.svg" alt="Fisko" className="app-logo-merkki" />
+        <img src="/logo/merkki.png" alt="Fisko" className="app-logo-merkki" />
         <div className="app-header-oikea">
           <NotificationBell onNavigoi={setValilehti} />
           <button className="kirjaudu-ulos" onClick={signOut}>
