@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AuthProvider, useAuth } from './auth/AuthContext.jsx'
 import AuthPage from './auth/AuthPage.jsx'
 import { TripsProvider } from './trips/TripsContext.jsx'
@@ -28,6 +28,10 @@ function PaaNakyma({ signOut }) {
   const [valilehti, setValilehti] = useState('lisaa')
   const [paivitysAvain, setPaivitysAvain] = useState(0)
   const [profiiliOsio, setProfiiliOsio] = useState('historia')
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [valilehti, profiiliOsio])
 
   function saalisTallennettu() {
     setPaivitysAvain((edellinen) => edellinen + 1)
